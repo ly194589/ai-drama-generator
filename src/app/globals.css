@@ -1,0 +1,425 @@
+/* Plus Jakarta Sans 通过 next/font / layout 预连接加载，避免 CSS @import 阻塞渲染 */
+
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  /* 使用 Plus Jakarta Sans 作为主字体 */
+  --font-sans:
+    'Plus Jakarta Sans', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
+  --font-serif:
+    'Noto Serif SC', 'Songti SC', 'SimSun', ui-serif, Georgia, Cambria,
+    'Times New Roman', Times, serif;
+}
+
+/* ===== Light Mode - Soft UI Evolution ===== */
+:root {
+  --radius: 0.75rem;
+  
+  /* Cinema Dark Theme 适配 */
+  --background: oklch(0.98 0.005 270);
+  --foreground: oklch(0.15 0.02 270);
+  
+  /* 卡片 - 更柔和的白色 */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.15 0.02 270);
+  
+  /* 弹出层 */
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0.02 270);
+  
+  /* Primary - 品牌紫（与全站渐变 accent 同源） */
+  --primary: oklch(0.55 0.22 290);
+  --primary-foreground: oklch(0.98 0 0);
+  
+  /* Secondary - 深紫色 #1E1B4B */
+  --secondary: oklch(0.3 0.08 270);
+  --secondary-foreground: oklch(0.98 0 0);
+  
+  /* Muted */
+  --muted: oklch(0.96 0.01 270);
+  --muted-foreground: oklch(0.5 0.02 270);
+  
+  /* Accent - 品牌紫淡彩 */
+  --accent: oklch(0.95 0.02 290);
+  --accent-foreground: oklch(0.35 0.12 290);
+  
+  /* CTA - Play Red #E11D48 */
+  --destructive: oklch(0.55 0.22 15);
+  
+  /* 边框和输入框 */
+  --border: oklch(0.92 0.01 270);
+  --input: oklch(0.92 0.01 270);
+  --ring: oklch(0.55 0.22 290);
+  
+  /* 图表颜色 */
+  --chart-1: oklch(0.55 0.22 15);
+  --chart-2: oklch(0.6 0.15 180);
+  --chart-3: oklch(0.65 0.18 330);
+  --chart-4: oklch(0.7 0.15 50);
+  --chart-5: oklch(0.55 0.12 250);
+  
+  /* 侧边栏 */
+  --sidebar: oklch(0.98 0.005 270);
+  --sidebar-foreground: oklch(0.2 0.02 270);
+  --sidebar-primary: oklch(0.55 0.22 290);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.95 0.02 290);
+  --sidebar-accent-foreground: oklch(0.35 0.12 290);
+  --sidebar-border: oklch(0.92 0.01 270);
+  --sidebar-ring: oklch(0.55 0.22 290);
+}
+
+/* ===== Dark Mode - Cinema Dark ===== */
+.dark {
+  --background: oklch(0.08 0.02 270);
+  --foreground: oklch(0.95 0.01 270);
+  
+  /* 卡片 - 深色玻璃效果 */
+  --card: oklch(0.12 0.02 270);
+  --card-foreground: oklch(0.95 0.01 270);
+  
+  /* 弹出层 */
+  --popover: oklch(0.12 0.02 270);
+  --popover-foreground: oklch(0.95 0.01 270);
+  
+  /* Primary - 亮紫色 */
+  --primary: oklch(0.7 0.15 290);
+  --primary-foreground: oklch(0.12 0 0);
+  
+  /* Secondary */
+  --secondary: oklch(0.2 0.03 270);
+  --secondary-foreground: oklch(0.95 0.01 270);
+  
+  /* Muted */
+  --muted: oklch(0.18 0.02 270);
+  --muted-foreground: oklch(0.65 0.02 270);
+  
+  /* Accent - 品牌紫深色淡彩 */
+  --accent: oklch(0.22 0.04 290);
+  --accent-foreground: oklch(0.95 0.01 270);
+  
+  /* CTA - Play Red */
+  --destructive: oklch(0.65 0.22 15);
+  
+  /* 边框 */
+  --border: oklch(0.25 0.02 270);
+  --input: oklch(0.2 0.02 270);
+  --ring: oklch(0.7 0.15 290);
+  
+  /* 图表颜色 */
+  --chart-1: oklch(0.65 0.22 15);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  
+  /* 侧边栏 */
+  --sidebar: oklch(0.1 0.02 270);
+  --sidebar-foreground: oklch(0.95 0.01 270);
+  --sidebar-primary: oklch(0.7 0.15 290);
+  --sidebar-primary-foreground: oklch(0.12 0 0);
+  --sidebar-accent: oklch(0.22 0.04 290);
+  --sidebar-accent-foreground: oklch(0.95 0.01 270);
+  --sidebar-border: oklch(0.2 0.02 270);
+  --sidebar-ring: oklch(0.7 0.15 290);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  /* 移除所有元素的默认 focus ring，避免闪烁 */
+  *:focus {
+    outline: none;
+  }
+}
+
+/* ===== 侧边栏折叠状态 ===== */
+body.sidebar-collapsed main {
+  padding-left: 4rem !important; /* 64px = w-16 */
+}
+
+body {
+  @apply font-sans antialiased;
+}
+
+/* ===== Soft UI Evolution 组件样式 ===== */
+@layer components {
+  /* 品牌渐变文字 */
+  .text-gradient-brand {
+    @apply bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500 bg-clip-text text-transparent;
+  }
+
+  /* 卡片悬浮效果 - Soft UI 风格 */
+  .card-hover {
+    @apply transition-all duration-200 cursor-pointer;
+  }
+  .card-hover:hover {
+    @apply shadow-lg shadow-primary/10 -translate-y-0.5;
+  }
+  
+  /* 题材选择卡片 - 增强交互 */
+  .genre-card {
+    @apply relative p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer;
+  }
+  .genre-card:hover {
+    @apply shadow-lg -translate-y-1;
+  }
+  .genre-card.selected {
+    @apply border-primary bg-primary/5 shadow-md shadow-primary/20;
+  }
+  
+  /* 冲突类型卡片 - 深色边框风格 */
+  .conflict-card {
+    @apply relative p-4 rounded-xl border transition-all duration-200 cursor-pointer;
+  }
+  .conflict-card:hover {
+    @apply shadow-md -translate-y-0.5;
+  }
+  .conflict-card.selected {
+    @apply ring-2 ring-primary ring-offset-2;
+  }
+  
+  /* 工作流步骤卡片 */
+  .workflow-step {
+    @apply transition-all duration-300;
+  }
+  .workflow-step.completed {
+    @apply border-green-500/50 bg-green-500/5;
+  }
+  .workflow-step.in-progress {
+    @apply border-primary/50 bg-primary/5;
+  }
+  
+  /* 按钮增强 - Play Red CTA */
+  .btn-cta {
+    @apply bg-destructive text-white hover:bg-destructive/90 
+           transition-all duration-200 shadow-lg shadow-destructive/25;
+  }
+  .btn-cta:hover {
+    @apply shadow-xl shadow-destructive/30 -translate-y-0.5;
+  }
+  
+  /* 侧边栏图标悬停渐变效果 */
+  .sidebar-icon {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* 悬停时的渐变背景 */
+  .group:hover .sidebar-icon:not(.bg-gradient-to-br) {
+    background: linear-gradient(to bottom right, var(--icon-from), var(--icon-to)) !important;
+    color: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  
+  /* 定义各颜色的CSS变量 */
+  [data-color="from-blue-500 to-cyan-500"] {
+    --icon-from: oklch(0.62 0.2 250);
+    --icon-to: oklch(0.65 0.15 195);
+  }
+  [data-color="from-violet-500 to-purple-500"] {
+    --icon-from: oklch(0.6 0.2 290);
+    --icon-to: oklch(0.55 0.2 300);
+  }
+  [data-color="from-orange-500 to-amber-500"] {
+    --icon-from: oklch(0.65 0.2 40);
+    --icon-to: oklch(0.7 0.18 75);
+  }
+  [data-color="from-pink-500 to-rose-500"] {
+    --icon-from: oklch(0.65 0.2 350);
+    --icon-to: oklch(0.6 0.2 10);
+  }
+  [data-color="from-green-500 to-emerald-500"] {
+    --icon-from: oklch(0.6 0.2 145);
+    --icon-to: oklch(0.65 0.18 160);
+  }
+  [data-color="from-red-500 to-orange-500"] {
+    --icon-from: oklch(0.55 0.22 20);
+    --icon-to: oklch(0.65 0.2 40);
+  }
+  [data-color="from-indigo-500 to-blue-500"] {
+    --icon-from: oklch(0.55 0.2 275);
+    --icon-to: oklch(0.62 0.2 250);
+  }
+  [data-color="from-teal-500 to-cyan-500"] {
+    --icon-from: oklch(0.6 0.15 175);
+    --icon-to: oklch(0.65 0.15 195);
+  }
+  [data-color="from-fuchsia-500 to-pink-500"] {
+    --icon-from: oklch(0.6 0.2 320);
+    --icon-to: oklch(0.65 0.2 350);
+  }
+  [data-color="from-sky-500 to-blue-500"] {
+    --icon-from: oklch(0.6 0.18 210);
+    --icon-to: oklch(0.62 0.2 250);
+  }
+  [data-color="from-violet-500 to-indigo-500"] {
+    --icon-from: oklch(0.6 0.2 290);
+    --icon-to: oklch(0.55 0.2 275);
+  }
+  [data-color="from-amber-500 to-yellow-500"] {
+    --icon-from: oklch(0.7 0.18 70);
+    --icon-to: oklch(0.8 0.15 85);
+  }
+  [data-color="from-slate-500 to-gray-500"] {
+    --icon-from: oklch(0.55 0.02 270);
+    --icon-to: oklch(0.5 0 0);
+  }
+}
+
+/* ===== 滚动条美化 ===== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: oklch(0.6 0.05 270 / 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.5 0.08 270 / 0.5);
+}
+
+/* 选中文本颜色 - 品牌紫 */
+::selection {
+  background: oklch(0.55 0.22 290 / 0.25);
+  color: oklch(0.15 0.02 270);
+}
+
+.dark ::selection {
+  background: oklch(0.65 0.2 290 / 0.35);
+  color: oklch(0.98 0 0);
+}
+
+/* ===== 动画 ===== */
+
+/* 剧集卡片环绕进度条动画 */
+@keyframes progress-border {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 200% 200%;
+  }
+}
+
+.episode-card-progress {
+  position: relative;
+}
+
+.episode-card-progress::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    oklch(0.55 0.22 15) 25%,
+    oklch(0.7 0.15 290) 50%,
+    oklch(0.55 0.22 15) 75%,
+    transparent 100%
+  );
+  background-size: 200% 200%;
+  animation: progress-border 1.5s linear infinite;
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* 淡入动画 */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.3s ease-out forwards;
+}
+
+/* 脉冲光效 */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px oklch(0.55 0.22 15 / 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px oklch(0.55 0.22 15 / 0.5);
+  }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* ===== 响应式优化 ===== */
+@media (max-width: 640px) {
+  .genre-card, .conflict-card {
+    @apply p-3;
+  }
+}

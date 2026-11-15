@@ -1,0 +1,113 @@
+{
+  "settingsLoaded": true,
+  "tab_llm": {
+    "tileExists": true,
+    "tileClicked": true,
+    "keyFormVisible": true,
+    "noteVisible": true,
+    "addFormAutoOpened": true,
+    "typed": true,
+    "clicked": true,
+    "toastOk": true,
+    "chip": true,
+    "selectShowsId": true
+  },
+  "tab_image": {
+    "tileExists": true,
+    "tileClicked": true,
+    "keyFormVisible": true,
+    "noteVisible": true,
+    "addFormAutoOpened": true,
+    "typed": true,
+    "clicked": true,
+    "toastOk": true,
+    "chip": true,
+    "selectShowsId": true
+  },
+  "tab_video": {
+    "tileExists": true,
+    "tileClicked": true,
+    "keyFormVisible": true,
+    "noteVisible": true,
+    "addFormAutoOpened": true,
+    "typed": true,
+    "clicked": true,
+    "toastOk": true,
+    "chip": true,
+    "selectShowsId": true
+  },
+  "tab_tts": {
+    "tileExists": true,
+    "tileClicked": true,
+    "keyFormVisible": true,
+    "noteVisible": true,
+    "addFormAutoOpened": true,
+    "typed": true,
+    "clicked": true,
+    "toastOk": true,
+    "chip": true,
+    "selectShowsId": true
+  },
+  "customKeySave": {
+    "keyTyped": true,
+    "urlTyped": true,
+    "saveClicked": true,
+    "toastOk": true,
+    "tileConfigured": true
+  },
+  "persistence": {
+    "llm": {
+      "selectShowsId": true,
+      "chip": true,
+      "tileSelected": true
+    },
+    "image": {
+      "selectShowsId": true,
+      "chip": true,
+      "tileSelected": true
+    },
+    "video": {
+      "selectShowsId": true,
+      "chip": true,
+      "tileSelected": true
+    },
+    "tts": {
+      "selectShowsId": true,
+      "chip": true,
+      "tileSelected": true
+    }
+  },
+  "dispatchTts": {
+    "status": 200,
+    "success": true,
+    "solution": "custom",
+    "speaker": "custom_voice_e2e",
+    "audioUrlKind": "data:audio/mpeg;base64,SUQzBwc",
+    "error": null
+  },
+  "dispatchLlm": {
+    "status": 200,
+    "mockContentReturned": true,
+    "preview": "{\"provider\":\"custom\",\"model\":\"mock-model\",\"content\":\"mock ok\"}"
+  },
+  "dispatchImage": {
+    "status": 200,
+    "success": true,
+    "provider": "custom",
+    "imageUrl": "http://127.0.0.1:5099/mock.png",
+    "error": null
+  },
+  "dispatchVideo": {
+    "status": 400,
+    "honestRejection": true,
+    "error": "自定义端点暂不支持视频生成，请在模型设置中选择扣子内置、智谱或千问的视频模型"
+  },
+  "mockHits": [
+    "/v1/chat/completions",
+    "/v1/audio/speech",
+    "/v1/chat/completions",
+    "/v1/images/generations",
+    "/mock.png"
+  ],
+  "cleaned": true
+}
