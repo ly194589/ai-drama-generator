@@ -35,6 +35,7 @@ import {
   ArrowRight,
   ChevronRight,
   Clock,
+  X,
 } from 'lucide-react';
 
 // FAQ数据 - 带分类图标
@@ -324,8 +325,17 @@ export default function HelpCenterPage() {
                   placeholder="搜索问题..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 bg-background/50 backdrop-blur-sm"
+                  className="pl-9 pr-9 bg-background/50 backdrop-blur-sm"
                 />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    aria-label="清空搜索"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -492,9 +502,22 @@ export default function HelpCenterPage() {
             {filteredCategories.length === 0 && (
               <div className="bg-card rounded-xl border border-border p-8 text-center">
                 <Search className="h-10 w-10 mx-auto text-muted-foreground/50 mb-3" />
-                <p className="text-muted-foreground mb-1">未找到相关问题</p>
-                <p className="text-xs text-muted-foreground/70">请尝试其他关键词</p>
-                <Button variant="outline" size="sm" className="mt-3" onClick={() => { setSearchQuery(''); setActiveCategory(null); }}>
+                <p className="text-muted-foreground mb-1">
+                  {searchQuery ? <>未找到与「{searchQuery}」相关的问题</> : '该分类下暂无问题'}
+                </p>
+                <p className="text-xs text-muted-foreground/70">换个关键词试试，或浏览全部问题</p>
+                <div className="flex flex-wrap justify-center gap-2 mt-4">
+                  {['剧本', '视频生成', '配音', '素材'].map((kw) => (
+                    <button
+                      key={kw}
+                      onClick={() => { setSearchQuery(kw); setActiveCategory(null); }}
+                      className="px-3 py-1 rounded-full border border-border text-xs text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors"
+                    >
+                      {kw}
+                    </button>
+                  ))}
+                </div>
+                <Button variant="outline" size="sm" className="mt-4" onClick={() => { setSearchQuery(''); setActiveCategory(null); }}>
                   查看全部
                 </Button>
               </div>

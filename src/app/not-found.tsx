@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Home } from 'lucide-react';
+import { Home, HelpCircle } from 'lucide-react';
 
 export default function NotFound() {
   return (
@@ -13,12 +13,20 @@ export default function NotFound() {
             你访问的页面可能已被删除或地址有误。
           </p>
         </div>
-        <Button asChild>
-          <Link href="/" className="gap-2">
-            <Home className="w-4 h-4" />
-            返回首页
-          </Link>
-        </Button>
+        <div className="flex items-center justify-center gap-3">
+          <Button asChild>
+            <Link href="/" className="gap-2">
+              <Home className="w-4 h-4" />
+              返回首页
+            </Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link href="/help-center" className="gap-2">
+              <HelpCircle className="w-4 h-4" />
+              帮助中心
+            </Link>
+          </Button>
+        </div>
       </div>
     </div>
   );

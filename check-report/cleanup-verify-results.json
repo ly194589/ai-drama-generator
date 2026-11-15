@@ -1,0 +1,64 @@
+{
+  "results": [
+    {
+      "name": "help-center 水合",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "空态回显关键词+推荐词",
+      "pass": true,
+      "detail": "{\"text\":\"未找到与「xyz不存在的关键词」相关的问题换个关键词试试，或浏览全部问题剧本视频生成配音素材查看全部\",\"chips\":[\"剧本\",\"视频生成\",\"配音\",\"素材\",\"查看全部\"]}"
+    },
+    {
+      "name": "清空按钮出现",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "推荐词点击生效",
+      "pass": true,
+      "detail": "{\"emptyGone\":true,\"inputValue\":\"剧本\"}"
+    },
+    {
+      "name": "清空按钮生效",
+      "pass": true,
+      "detail": "{\"value\":\"\",\"fullList\":true}"
+    },
+    {
+      "name": "深色空态截图",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "404 双按钮",
+      "pass": true,
+      "detail": "{\"has404\":true,\"btns\":[\"返回首页\",\"帮助中心\"]}"
+    },
+    {
+      "name": "404 跳转帮助中心",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "settings 骨架屏",
+      "pass": true,
+      "detail": "peak=19 (已截图)"
+    },
+    {
+      "name": "骨架后真实页面接管",
+      "pass": true,
+      "detail": "{\"path\":\"/settings\",\"skeletons\":0,\"hasContent\":true}"
+    },
+    {
+      "name": "无页面 JS 异常",
+      "pass": true,
+      "detail": ""
+    }
+  ],
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+    "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+  ]
+}
