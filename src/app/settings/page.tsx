@@ -38,6 +38,8 @@ import {
   Cpu,
   Plus,
   X,
+  Activity,
+  BarChart3,
 } from 'lucide-react';
 import { isAdmin } from '@/lib/admin-utils';
 import {
@@ -164,6 +166,10 @@ export default function SettingsPage() {
   const [providerErrors, setProviderErrors] = useState<Record<string, string | null>>({});
   const [providerSuccess, setProviderSuccess] = useState<Record<string, string | null>>({});
   const [savingProvider, setSavingProvider] = useState<string | null>(null);
+  /** 正在测试连通性的提供商 */
+  const [testingProvider, setTestingProvider] = useState<string | null>(null);
+  /** 按模型调用次数统计（仅统计，不计费） */
+  const [modelUsage, setModelUsage] = useState<{ provider: string; model: string; count: number; lastUsedAt: string }[]>([]);
   /** 当前正在添加自定义模型的模型类型 */
   const [customModelType, setCustomModelType] = useState<ModelType | null>(null);
   /** 自定义模型输入草稿 */
@@ -263,6 +269,15 @@ export default function SettingsPage() {
         }
         return next;
       });
+
+      // 用量统计：仅展示，失败不影响页面
+      try {
+        const usageRes = await fetch('/api/providers/usage', { headers: userIdHeader() });
+        const usageData = await usageRes.json();
+        if (Array.isArray(usageData.usage)) setModelUsage(usageData.usage);
+      } catch {
+        // 统计非关键路径，忽略
+      }
     } catch (error) {
       console.error('获取提供商配置失败:', error);
       // 即使出错也设置基础配置
@@ -510,6 +525,38 @@ export default function SettingsPage() {
     }
   };
 
+  // 测试已保存密钥的连通性
+  const handleTestProvider = async (provider: ProviderConfig) => {
+    setTestingProvider(provider.id);
+    setProviderErrors(prev => ({ ...prev, [provider.id]: null }));
+    setProviderSuccess(prev => ({ ...prev, [provider.id]: null }));
+
+    try {
+      const res = await fetch(`${PROVIDER_ENDPOINT}/test`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': localStorage.getItem('userId') || 'dev-user',
+        },
+        body: JSON.stringify({ provider: provider.id }),
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setProviderSuccess(prev => ({ ...prev, [provider.id]: data.message || '连接正常' }));
+        toast.success(data.message || `${provider.name} 连接正常`);
+      } else {
+        setProviderErrors(prev => ({ ...prev, [provider.id]: data.error || '连接失败' }));
+        toast.error(data.error || '连接失败');
+      }
+    } catch (error) {
+      console.error('测试连接失败:', error);
+      setProviderErrors(prev => ({ ...prev, [provider.id]: '测试失败，请稍后重试' }));
+    } finally {
+      setTestingProvider(null);
+    }
+  };
+
   const getProviderName = (provider: string): string => {
     switch (provider) {
       case 'coze': return '扣子平台';
@@ -594,10 +641,26 @@ export default function SettingsPage() {
           ) : (
             <span />
           )}
-          <Button size="sm" onClick={() => handleSaveApiKey(provider)} disabled={saving} className="h-8">
-            {saving ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> : <KeyRound className="h-3.5 w-3.5 mr-1.5" />}
-            {saving ? '验证中...' : '保存密钥'}
-          </Button>
+          <div className="flex items-center gap-2">
+            {provider.configured && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleTestProvider(provider)}
+                disabled={testingProvider === provider.id}
+                className="h-8"
+              >
+                {testingProvider === provider.id
+                  ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                  : <Activity className="h-3.5 w-3.5 mr-1.5" />}
+                测试连接
+              </Button>
+            )}
+            <Button size="sm" onClick={() => handleSaveApiKey(provider)} disabled={saving} className="h-8">
+              {saving ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> : <KeyRound className="h-3.5 w-3.5 mr-1.5" />}
+              {saving ? '验证中...' : '保存密钥'}
+            </Button>
+          </div>
         </div>
         {error && <p className="text-xs text-destructive flex items-center gap-1"><AlertCircle className="h-3 w-3" />{error}</p>}
         {success && <p className="text-xs text-emerald-600 flex items-center gap-1"><CheckCircle2 className="h-3 w-3" />{success}</p>}
@@ -609,7 +672,7 @@ export default function SettingsPage() {
     <MainLayout>
       <div className="space-y-6">
         {/* Header - 淡彩 hero，与全站工具页统一 */}
-        <div className="relative overflow-hidden rounded-2xl">
+        <div className="workspace-hero relative overflow-hidden rounded-2xl">
           <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 via-purple-500/5 to-transparent" />
           <div className="absolute top-0 right-0 w-64 h-64 bg-violet-500/20 rounded-full blur-3xl" />
           <div className="relative z-10 p-6 sm:p-8">
@@ -1106,6 +1169,45 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
 
+            {/* 按模型用量（仅统计） */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <span className="p-1.5 rounded-lg bg-gradient-to-br from-sky-500 to-blue-500 text-white shadow-sm">
+                    <BarChart3 className="h-3.5 w-3.5" />
+                  </span>
+                  按模型用量
+                </CardTitle>
+                <CardDescription>仅统计成功调用次数，不参与计费或额度扣减</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {modelUsage.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">
+                    暂无调用记录，生成内容后会在这里按模型累计
+                  </p>
+                ) : (
+                  modelUsage.slice(0, 6).map(item => (
+                    <div
+                      key={`${item.provider}-${item.model}`}
+                      className="flex items-center justify-between gap-2 p-2.5 rounded-lg border bg-muted/20"
+                    >
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium truncate font-mono" title={item.model}>
+                          {item.model}
+                        </div>
+                        <div className="text-[10px] text-muted-foreground">
+                          {getProviderName(item.provider)} · {new Date(item.lastUsedAt).toLocaleDateString('zh-CN')}
+                        </div>
+                      </div>
+                      <Badge variant="secondary" className="text-[10px] flex-shrink-0">
+                        {item.count} 次
+                      </Badge>
+                    </div>
+                  ))
+                )}
+              </CardContent>
+            </Card>
+
             {/* Auth Status */}
             <Card>
               <CardHeader>
@@ -1162,6 +1264,7 @@ export default function SettingsPage() {
             <p>模型选择保存后立即生效，各生成功能将按所选厂商与模型调用；此处不再需要切换「方案」。</p>
             <p>每个模型类型都支持「添加自定义模型」：输入端点实际支持的模型名即可启用，清单保存在本机浏览器，可随时切换或删除。</p>
             <p>「自定义」厂商在四个分类下均可配置：填写 API Key 与 OpenAI 兼容端点地址后，按分类添加自定义模型（视频自定义端点的生成暂未接入，面板内有提示）。</p>
+            <p>API Key 加密存储、仅服务端调用、日志脱敏，接口只回显掩码；保存后可用「测试连接」随时验证密钥是否仍有效。</p>
           </div>
         </div>
       </div>

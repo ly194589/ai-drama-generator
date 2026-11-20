@@ -4,7 +4,6 @@ import { useState, useEffect, Suspense } from 'react';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,13 +22,13 @@ import {
   ExternalLink,
   Unlink,
   Crown,
+  Infinity,
   Star,
   Gift,
   Sparkles,
   FileText,
   Film,
   Zap,
-  ShoppingCart,
   CreditCard,
   Package,
   ChevronRight,
@@ -38,7 +37,7 @@ import {
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { pricingPlans, resourcePacks } from '@/lib/site-config';
+import { pricingPlans } from '@/lib/site-config';
 import { toast } from 'sonner';
 
 interface CozeStatus {
@@ -92,9 +91,10 @@ interface UsageRecord {
 // 套餐配置
 const planConfig: Record<string, { icon: typeof Crown; color: string; price: number }> = {
   trial: { icon: Sparkles, color: 'text-gray-500', price: 0 },
-  monthly: { icon: Star, color: 'text-blue-500', price: 29.9 },
-  quarterly: { icon: Gift, color: 'text-violet-500', price: 79 },
-  yearly: { icon: Crown, color: 'text-amber-500', price: 299 },
+  monthly: { icon: Star, color: 'text-blue-500', price: 19.9 },
+  quarterly: { icon: Gift, color: 'text-violet-500', price: 39.9 },
+  yearly: { icon: Crown, color: 'text-amber-500', price: 109 },
+  lifetime: { icon: Infinity, color: 'text-rose-500', price: 298 },
 };
 
 export default function ProfilePage() {
@@ -123,7 +123,6 @@ function ProfilePageContent() {
   const [unbindingCoze, setUnbindingCoze] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
-  const [purchasing, setPurchasing] = useState<string | null>(null);
   const [usageRecords, setUsageRecords] = useState<UsageRecord[]>([]);
   const [loadingRecords, setLoadingRecords] = useState(false);
   
@@ -316,55 +315,6 @@ function ProfilePageContent() {
     }
   };
 
-  // 购买资源包
-  const handlePurchasePack = async (packId: string) => {
-    setPurchasing(packId);
-    try {
-      const pack = resourcePacks.find(p => p.id === packId);
-      if (!pack) return;
-      
-      // 检测设备类型，PC端使用网页支付，移动端使用手机支付
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      const payType = isMobile ? 'wap' : 'page';
-      
-      // 创建订单
-      const response = await fetch('/api/payment/create-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ planType: packId, payType }),
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        toast.error(data.error || '创建订单失败');
-        return;
-      }
-      
-      // 模拟支付成功后激活
-      const confirmResponse = await fetch('/api/payment/confirm', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderNo: data.order.orderNo }),
-      });
-      
-      const confirmData = await confirmResponse.json();
-      
-      if (confirmResponse.ok) {
-        toast.success(`购买成功！已添加${pack.name}`);
-        // 刷新订阅信息
-        loadData();
-      } else {
-        toast.error(confirmData.error || '购买失败');
-      }
-    } catch (error) {
-      console.error('购买失败:', error);
-      toast.error('购买失败，请重试');
-    } finally {
-      setPurchasing(null);
-    }
-  };
-
   // 升级套餐
   const handleUpgrade = (planId: string) => {
     router.push(`/login?plan=${planId}`);
@@ -543,7 +493,7 @@ function ProfilePageContent() {
                   {subscription && (
                     <Badge variant="outline" className="gap-1">
                       <Clock className="h-3 w-3" />
-                      剩余 {subscription.remainingDays} 天
+                      {subscription.planType === 'lifetime' ? '长期有效' : `剩余 ${subscription.remainingDays} 天`}
                     </Badge>
                   )}
                 </CardTitle>
@@ -559,7 +509,11 @@ function ProfilePageContent() {
                     </div>
                     <div className="text-right">
                       <p className="text-sm text-muted-foreground">到期时间</p>
-                      <p className="font-medium">{new Date(subscription.expiresAt).toLocaleDateString()}</p>
+                      <p className="font-medium">
+                        {subscription.planType === 'lifetime'
+                          ? '长期有效'
+                          : new Date(subscription.expiresAt).toLocaleDateString()}
+                      </p>
                     </div>
                   </div>
                 ) : (
@@ -578,9 +532,12 @@ function ProfilePageContent() {
                 <h3 className="text-lg font-semibold">升级套餐</h3>
               </div>
               
-              <div className="grid grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
                 {pricingPlans.filter(p => p.id !== 'trial').map((plan) => {
-                  const Icon = plan.icon === 'Crown' ? Crown : plan.icon === 'Gift' ? Gift : Star;
+                  const Icon =
+                    plan.icon === 'Crown' ? Crown :
+                    plan.icon === 'Gift' ? Gift :
+                    plan.icon === 'Infinity' ? Infinity : Star;
                   const isCurrent = subscription?.planType === plan.id;
                   const isRecommended = plan.badge === '推荐';
                   const saving = plan.originalPrice ? plan.originalPrice - plan.price : 0;
@@ -613,7 +570,8 @@ function ProfilePageContent() {
                             'w-12 h-12 rounded-xl flex items-center justify-center',
                             plan.id === 'monthly' && 'bg-blue-500',
                             plan.id === 'quarterly' && 'bg-violet-500',
-                            plan.id === 'yearly' && 'bg-amber-500'
+                            plan.id === 'yearly' && 'bg-amber-500',
+                            plan.id === 'lifetime' && 'bg-rose-500'
                           )}>
                             <Icon className="h-6 w-6 text-white" />
                           </div>
@@ -644,19 +602,25 @@ function ProfilePageContent() {
                           )}
                         </div>
                         
-                        {/* 配额 */}
+                        {/* 使用说明 */}
                         <div className="space-y-3 mb-6 text-sm border-t pt-5 flex-1">
-                          {[
-                            { label: '剧本额度', value: plan.quotas.scripts },
-                            { label: '视频额度', value: plan.quotas.videos },
-                            { label: '图片额度', value: plan.quotas.images },
-                            { label: '音乐额度', value: plan.quotas.music },
-                          ].map((item) => (
-                            <div key={item.label} className="flex justify-between items-center">
-                              <span className="text-muted-foreground">{item.label}</span>
-                              <span className="font-semibold">{item.value.toLocaleString()}/月</span>
-                            </div>
-                          ))}
+                          <div className="flex justify-between items-center">
+                            <span className="text-muted-foreground">生成次数</span>
+                            <span className="font-semibold text-emerald-600">不限</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-muted-foreground">使用时长</span>
+                            <span className="font-semibold">
+                              {plan.durationDays >= 36500 ? '长期有效' : `${plan.durationDays}天`}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-muted-foreground">计费方式</span>
+                            <span className="font-semibold">网站使用费</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground leading-relaxed pt-1">
+                            自带模型 API Key，模型费用按厂商实价另计；也可用平台内置模型（代运行服务单独计费）。
+                          </p>
                         </div>
                         
                         {/* 按钮 */}
@@ -681,74 +645,11 @@ function ProfilePageContent() {
               </div>
             </div>
 
-            {/* 资源包 */}
-            <div className="space-y-6">
-              <div className="flex items-center gap-2">
-                <ShoppingCart className="h-5 w-5 text-green-500" />
-                <h3 className="text-lg font-semibold">资源包</h3>
-                <span className="text-sm text-muted-foreground">— 额度不足？购买资源包补充</span>
-              </div>
-              
-              <div className="grid grid-cols-5 gap-5">
-                {resourcePacks.map((pack) => (
-                  <div
-                    key={pack.id}
-                    className={cn(
-                      'relative rounded-2xl border-2 bg-card transition-all duration-300 hover:shadow-lg flex flex-col',
-                      pack.popular ? 'border-primary' : 'border-border hover:border-primary/50'
-                    )}
-                  >
-                    {pack.popular && (
-                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow">
-                        热门
-                      </div>
-                    )}
-                    
-                    <div className="p-5 text-center flex-1 flex flex-col">
-                      {/* 图标 */}
-                      <div className={cn(
-                        'w-10 h-10 rounded-xl mx-auto mb-3 flex items-center justify-center',
-                        pack.id.includes('script') && 'bg-blue-500 text-white',
-                        pack.id.includes('video') && 'bg-red-500 text-white',
-                        pack.id.includes('music') && 'bg-green-500 text-white',
-                        pack.id.includes('image') && 'bg-orange-500 text-white'
-                      )}>
-                        {pack.id.includes('script') && <FileText className="h-5 w-5" />}
-                        {pack.id.includes('video') && <Video className="h-5 w-5" />}
-                        {pack.id.includes('music') && <Music className="h-5 w-5" />}
-                        {pack.id.includes('image') && <ImageIcon className="h-5 w-5" />}
-                      </div>
-                      
-                      <h4 className="font-semibold mb-1">{pack.name}</h4>
-                      <p className="text-xs text-muted-foreground mb-4">{pack.description}</p>
-                      
-                      <div className="text-2xl font-bold mb-4 mt-auto">
-                        <span className="text-sm text-muted-foreground mr-0.5">¥</span>
-                        {pack.price.toFixed(2)}
-                      </div>
-                      
-                      <Button
-                        className="w-full h-9 font-semibold"
-                        variant={pack.popular ? 'default' : 'outline'}
-                        onClick={() => handlePurchasePack(pack.id)}
-                        disabled={purchasing === pack.id}
-                      >
-                        {purchasing === pack.id ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          '购买'
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
           </TabsContent>
 
           {/* 用量统计 */}
           <TabsContent value="usage" className="space-y-6">
-            {/* 配额概览 */}
+            {/* 用量概览 */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               <Card>
                 <CardContent className="pt-6">
@@ -760,14 +661,10 @@ function ProfilePageContent() {
                       <p className="text-sm text-muted-foreground">剧本生成</p>
                       <div className="flex items-baseline gap-2">
                         <p className="text-2xl font-bold">{subscription?.quotas?.scripts?.used || 0}</p>
-                        <p className="text-sm text-muted-foreground">/ {subscription?.quotas?.scripts?.total || 0}</p>
+                        <p className="text-sm text-muted-foreground">次</p>
                       </div>
                     </div>
                   </div>
-                  <Progress 
-                    value={subscription?.quotas?.scripts ? (subscription.quotas.scripts.used / subscription.quotas.scripts.total) * 100 : 0} 
-                    className="h-1.5 mt-3" 
-                  />
                 </CardContent>
               </Card>
               <Card>
@@ -780,14 +677,10 @@ function ProfilePageContent() {
                       <p className="text-sm text-muted-foreground">视频生成</p>
                       <div className="flex items-baseline gap-2">
                         <p className="text-2xl font-bold">{subscription?.quotas?.videos?.used || 0}</p>
-                        <p className="text-sm text-muted-foreground">/ {subscription?.quotas?.videos?.total || 0}</p>
+                        <p className="text-sm text-muted-foreground">次</p>
                       </div>
                     </div>
                   </div>
-                  <Progress 
-                    value={subscription?.quotas?.videos ? (subscription.quotas.videos.used / subscription.quotas.videos.total) * 100 : 0} 
-                    className="h-1.5 mt-3" 
-                  />
                 </CardContent>
               </Card>
               <Card>
@@ -800,14 +693,10 @@ function ProfilePageContent() {
                       <p className="text-sm text-muted-foreground">图片生成</p>
                       <div className="flex items-baseline gap-2">
                         <p className="text-2xl font-bold">{subscription?.quotas?.images?.used || 0}</p>
-                        <p className="text-sm text-muted-foreground">/ {subscription?.quotas?.images?.total || 0}</p>
+                        <p className="text-sm text-muted-foreground">次</p>
                       </div>
                     </div>
                   </div>
-                  <Progress 
-                    value={subscription?.quotas?.images ? (subscription.quotas.images.used / subscription.quotas.images.total) * 100 : 0} 
-                    className="h-1.5 mt-3" 
-                  />
                 </CardContent>
               </Card>
               <Card>
@@ -820,14 +709,10 @@ function ProfilePageContent() {
                       <p className="text-sm text-muted-foreground">音乐生成</p>
                       <div className="flex items-baseline gap-2">
                         <p className="text-2xl font-bold">{subscription?.quotas?.music?.used || 0}</p>
-                        <p className="text-sm text-muted-foreground">/ {subscription?.quotas?.music?.total || 0}</p>
+                        <p className="text-sm text-muted-foreground">次</p>
                       </div>
                     </div>
                   </div>
-                  <Progress 
-                    value={subscription?.quotas?.music ? (subscription.quotas.music.used / subscription.quotas.music.total) * 100 : 0} 
-                    className="h-1.5 mt-3" 
-                  />
                 </CardContent>
               </Card>
             </div>
@@ -835,7 +720,8 @@ function ProfilePageContent() {
             {/* 快捷操作 */}
             <Card>
               <CardHeader>
-                <CardTitle>额度不足？</CardTitle>
+                <CardTitle>需要更长的使用时长？</CardTitle>
+                <CardDescription>升级到月卡 / 季卡 / 年卡 / 终身卡，有效期内不限生成次数</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-4">
@@ -843,9 +729,9 @@ function ProfilePageContent() {
                     <Crown className="h-4 w-4 mr-2" />
                     升级套餐
                   </Button>
-                  <Button variant="outline" onClick={() => router.push('/profile?tab=subscription')}>
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    购买资源包
+                  <Button variant="outline" onClick={() => router.push('/solution#pricing')}>
+                    <Zap className="h-4 w-4 mr-2" />
+                    查看定价
                   </Button>
                 </div>
               </CardContent>

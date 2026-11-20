@@ -66,7 +66,8 @@ export async function GET(request: NextRequest) {
     }
 
     const hasApiKey = !!(data?.qwen_api_key);
-    const maskedKey = hasApiKey ? maskApiKey(data.qwen_api_key) : null;
+    const { decryptSecret } = await import('@/lib/secret-crypto');
+    const maskedKey = hasApiKey ? maskApiKey(decryptSecret(data.qwen_api_key)) : null;
 
     return NextResponse.json({
       configured: hasApiKey,
@@ -114,15 +115,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 保存到数据库
+    // 保存到数据库（密钥加密落库）
     const { getSupabaseClient } = await import('@/storage/database/supabase-client');
+    const { encryptSecret } = await import('@/lib/secret-crypto');
     const supabase = getSupabaseClient();
 
     const { error: upsertError } = await supabase
       .from('user_config')
       .upsert({
         user_id: userId,
-        qwen_api_key: apiKey,
+        qwen_api_key: encryptSecret(apiKey),
         qwen_api_key_set_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       }, {

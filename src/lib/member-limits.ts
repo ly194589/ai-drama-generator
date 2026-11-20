@@ -4,7 +4,7 @@
  */
 
 // 会员等级类型
-export type MemberTier = 'trial' | 'monthly' | 'quarterly' | 'yearly' | 'admin';
+export type MemberTier = 'trial' | 'monthly' | 'quarterly' | 'yearly' | 'lifetime' | 'admin';
 
 // 视频限制配置
 export interface VideoLimits {
@@ -117,6 +117,26 @@ export const MEMBER_LIMITS: Record<MemberTier, MemberLimits> = {
       maxSampleRate: 48000,
       voiceOptions: 'custom',
       description: '年卡：定制音色，48kHz',
+    },
+  },
+  lifetime: {
+    tier: 'lifetime',
+    video: {
+      maxResolution: '4k',
+      maxDuration: 15,
+      maxFileSize: 500,
+      canGenerateAudio: true,
+      description: '终身卡：4K视频，最长15秒',
+    },
+    image: {
+      maxSize: '4K',
+      maxBatchCount: 8,
+      description: '终身卡：4K图片，批量8张',
+    },
+    audio: {
+      maxSampleRate: 48000,
+      voiceOptions: 'custom',
+      description: '终身卡：定制音色，48kHz',
     },
   },
   admin: {

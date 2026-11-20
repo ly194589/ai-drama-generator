@@ -1,15 +1,17 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 import { AppSidebar } from './app-sidebar';
 import { useSubscription } from '@/hooks/use-subscription';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Menu } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 // 完全公开的页面（不需要登录，也不显示侧边栏）
-const PUBLIC_PATHS = ['/login', '/docs', '/help-center', '/solution', '/about'];
+const PUBLIC_PATHS = ['/login', '/solution', '/about'];
 
 // 可选登录的页面（未登录可访问，始终显示侧边栏）
-const OPTIONAL_AUTH_PATHS = ['/', '/profile', '/settings'];
+const OPTIONAL_AUTH_PATHS = ['/', '/profile', '/settings', '/skills', '/docs', '/help-center'];
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -17,10 +19,17 @@ interface MainLayoutProps {
 
 export function MainLayout({ children }: MainLayoutProps) {
   const pathname = usePathname();
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   // 检查页面类型
   const isPublicPage = PUBLIC_PATHS.some(path => pathname?.startsWith(path));
   const isOptionalAuthPage = OPTIONAL_AUTH_PATHS.includes(pathname || '');
+  const pageTitle = pathname === '/' ? '创作工作台' : ({
+    '/drama': '剧本创作', '/images': '图片管理', '/videos': '视频管理', '/audio': '音乐管理',
+    '/workflow': '工作流', '/editor': '视频剪辑', '/chat': 'AI 顾问', '/ai-advisor': 'AI 顾问',
+    '/settings': '模型设置', '/profile': '个人中心', '/config': '配置工具', '/prompts': '提示词库',
+    '/docs': '文档中心', '/help-center': '帮助中心', '/storyboard': '分镜管理', '/skills': 'Skill 市场',
+  } as Record<string, string>)[pathname || ''] || 'AI 短剧创作';
 
   // 始终检查用户登录状态（用于决定是否显示侧边栏）
   const { isAuthorized, isLoading } = useSubscription(!isPublicPage && !isOptionalAuthPage);
@@ -33,7 +42,9 @@ export function MainLayout({ children }: MainLayoutProps) {
       <div className="min-h-screen bg-background">
         <main className="min-h-screen">
           {withContainer ? (
-            <div className="container mx-auto p-4 sm:p-6 max-w-7xl">{children}</div>
+            <div className="app-page-content mx-auto min-h-screen w-full max-w-[1440px] px-4 py-6 sm:px-6 sm:py-8 lg:px-10" data-page={pathname || 'public'}>
+              {children}
+            </div>
           ) : (
             children
           )}
@@ -70,15 +81,38 @@ export function MainLayout({ children }: MainLayoutProps) {
   if (isAuthorized || isOptionalAuthPage) {
     return (
       <div className="min-h-screen bg-background">
-        <AppSidebar />
-        <main className="min-h-screen transition-all duration-300 ease-in-out pl-0 lg:pl-64">
-          <div className="container mx-auto p-4 sm:p-6 max-w-7xl">
+        <AppSidebar mobileOpen={mobileNavOpen} onMobileOpenChange={setMobileNavOpen} />
+        {mobileNavOpen && (
+          <button
+            type="button"
+            aria-label="关闭导航菜单"
+            className="fixed inset-0 z-30 bg-foreground/30 backdrop-blur-[2px] lg:hidden"
+            onClick={() => setMobileNavOpen(false)}
+          />
+        )}
+        <main className="app-workspace-main min-h-screen min-w-0 transition-[padding] duration-300 ease-in-out pl-0 lg:pl-64">
+          <div className="mx-auto min-h-screen w-full max-w-[1600px] px-4 pb-8 pt-4 sm:px-6 sm:pt-6 lg:px-8">
+            <div className="sticky top-0 z-20 -mx-4 mb-5 flex h-14 items-center gap-3 border-b border-border/70 bg-background/90 px-4 backdrop-blur-xl sm:-mx-6 sm:px-6 lg:hidden">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 shrink-0"
+                aria-label="打开导航菜单"
+                onClick={() => setMobileNavOpen(true)}
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+              <span className="truncate text-sm font-semibold tracking-tight">{pageTitle}</span>
+              <span className="ml-auto rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-medium text-primary">AI 短剧工作台</span>
+            </div>
+            <div className="app-page-content min-w-0" data-page={pathname || 'home'}>
             {children}
+            </div>
           </div>
         </main>
-        <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-32 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-          <div className="absolute -bottom-40 -left-32 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+        <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+          <div className="absolute -right-40 -top-48 h-[32rem] w-[32rem] rounded-full bg-primary/[0.035] blur-3xl" />
+          <div className="absolute -bottom-48 -left-48 h-[28rem] w-[28rem] rounded-full bg-accent/40 blur-3xl" />
         </div>
       </div>
     );

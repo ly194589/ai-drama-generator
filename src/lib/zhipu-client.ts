@@ -340,6 +340,7 @@ async function fetchUserApiKey(userId?: string): Promise<string | null> {
   }
   
   try {
+    const { decryptSecret } = await import('@/lib/secret-crypto');
     const { getSupabaseClient } = await import('@/storage/database/supabase-client');
     const supabase = getSupabaseClient();
     
@@ -352,14 +353,17 @@ async function fetchUserApiKey(userId?: string): Promise<string | null> {
     if (error || !data?.zhipu_api_key) {
       return null;
     }
-    
+
+    const apiKey = decryptSecret(data.zhipu_api_key);
+    if (!apiKey) return null;
+
     // 缓存 5 分钟
     userApiKeyCache.set(userId, {
-      key: data.zhipu_api_key,
+      key: apiKey,
       expires: Date.now() + 5 * 60 * 1000,
     });
-    
-    return data.zhipu_api_key;
+
+    return apiKey;
   } catch (error) {
     console.error('[智谱] 获取用户API Key失败:', error);
     return null;

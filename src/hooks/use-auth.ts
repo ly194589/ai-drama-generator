@@ -206,18 +206,7 @@ export function useAuth() {
   // 登出
   const logout = useCallback(async () => {
     try {
-      const token = localStorage.getItem('access_token');
-      const oauthProvider = localStorage.getItem('oauth_provider');
-      
-      // 只对 Supabase Auth 用户调用登出 API
-      if (token && oauthProvider !== 'coze' && oauthProvider !== 'card_key') {
-        await fetch('/api/auth/logout', {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-      }
+      await fetch('/api/auth/logout', { method: 'POST' });
     } catch (error) {
       console.error('登出失败:', error);
     } finally {

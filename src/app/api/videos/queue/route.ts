@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
       console.log(`[队列API] 已添加 ${data.length} 个任务到队列`);
 
       // 触发队列处理
-      triggerQueueProcessing();
+      triggerQueueProcessing(request.headers);
 
       return NextResponse.json({
         success: true,
@@ -167,7 +167,7 @@ export async function POST(request: NextRequest) {
       console.log(`[队列API] 任务已添加: ${data.id}`);
 
       // 触发队列处理
-      triggerQueueProcessing();
+      triggerQueueProcessing(request.headers);
 
       return NextResponse.json({
         success: true,
@@ -234,13 +234,16 @@ export async function DELETE(request: NextRequest) {
 }
 
 // 触发队列处理
-function triggerQueueProcessing() {
+function triggerQueueProcessing(requestHeaders: Headers) {
   // 使用 fetch 调用处理接口（非阻塞）
   const processUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/videos/queue/process`;
   
   fetch(processUrl, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(requestHeaders.get('cookie') ? { cookie: requestHeaders.get('cookie')! } : {}),
+    },
     body: JSON.stringify({ async: true }),
   }).catch(err => {
     console.error('[队列API] 触发处理失败:', err);

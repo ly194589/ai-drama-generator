@@ -1,0 +1,45 @@
+{
+  "api": "see report",
+  "ui": [
+    {
+      "name": "登录页表单 hydration",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "填入用户名",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "填入密码",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "找到登录按钮",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "登录后会话生效",
+      "ok": true,
+      "detail": "{\"path\":\"/\",\"authed\":true,\"user\":\"admin\"}"
+    },
+    {
+      "name": "离开登录页进入站点",
+      "ok": true,
+      "detail": "/"
+    },
+    {
+      "name": "侧栏显示已登录态（无登录按钮）",
+      "ok": true,
+      "detail": "{\"hasLoginBtn\":false,\"text\":\"台\\n概览\\n首页\\n模型设置\\n剧本创作\\n素材管理\\n图片管理\\n音乐管理\\n视频管理\\n创作工具\\n视频剪辑\\n配置工具\\nAI助手\\nSkill 市场\\n提示词库\\nAI顾问\\n系统\\n帮助中心\\n文档站\\n更多\\n解决方案\\n关于我们\\nA\\nadmin\\n管理员\\n管理员\\n永久\"}"
+    },
+    {
+      "name": "登录后截图落盘",
+      "ok": true,
+      "detail": "check-report/auth-login-after.png"
+    }
+  ]
+}

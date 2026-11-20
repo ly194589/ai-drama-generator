@@ -46,10 +46,10 @@ export async function POST(request: NextRequest) {
     // 生成唯一文件名
     const ext = file.name.split('.').pop() || 'jpg';
     const uniqueName = `${type}-${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
-    
+
     // 确定上传目录
     const uploadDir = join(process.cwd(), 'public', 'uploads', type);
-    
+
     // 确保目录存在
     if (!existsSync(uploadDir)) {
       await mkdir(uploadDir, { recursive: true });

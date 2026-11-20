@@ -340,7 +340,7 @@ export default function ConfigPage() {
     <MainLayout>
       <div className="space-y-6">
         {/* Hero Header with Aurora Gradient */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 p-8 mb-2">
+        <div className="workspace-hero relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 p-8 mb-2">
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
           <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/20 rounded-full blur-3xl" />
           <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-violet-300/30 rounded-full blur-3xl" />

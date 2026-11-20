@@ -1,8 +1,16 @@
 import type { Metadata, Viewport } from 'next';
+import { Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import HomePageSchema from '@/components/seo/json-ld';
 import { Toaster } from '@/components/ui/sonner';
-import Fonts from '@/components/fonts';
+
+// 自托管字体：构建期下载并生成本地 CSS，避免运行时 media 改写造成的属性差异
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800'],
+  variable: '--font-jakarta',
+  display: 'swap',
+});
 
 // 网站基础配置
 const siteUrl = process.env.COZE_PROJECT_DOMAIN_DEFAULT || 'https://aiduanju.coze.site';
@@ -131,9 +139,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="zh-CN" suppressHydrationWarning>
+    <html lang="zh-CN" className={plusJakarta.variable}>
       <body className="font-sans">
-        <Fonts />
         <HomePageSchema />
         {children}
         <Toaster />

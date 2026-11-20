@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseClient } from '@/storage/database/supabase-client';
-
-// 预定义的管理员账号（用户名 -> 用户ID映射）
-const ADMIN_ACCOUNTS: Record<string, string> = {
-  'admin': 'admin',
-  'dev_user': 'dev_user',
-  'demo-user': 'demo-user',
-};
+import { isAuthSessionConfigured, setSessionCookie } from '@/lib/auth-session';
+import { hashPassword } from '@/lib/password';
 
 /**
  * 用户注册 API
@@ -21,10 +16,13 @@ const ADMIN_ACCOUNTS: Record<string, string> = {
  */
 export async function POST(request: NextRequest) {
   try {
+    if (!isAuthSessionConfigured()) {
+      return NextResponse.json({ error: '服务端未配置登录会话密钥' }, { status: 503 });
+    }
     const { username, password, email } = await request.json();
 
     // 参数验证
-    if (!username || !password) {
+    if (typeof username !== 'string' || typeof password !== 'string' || !username || !password) {
       return NextResponse.json(
         { error: '请填写用户名和密码' },
         { status: 400 }
@@ -74,23 +72,13 @@ export async function POST(request: NextRequest) {
         );
       }
       
-      // 检查管理员账号是否已被创建
-      if (ADMIN_ACCOUNTS[username]) {
-        const adminExists = existingCards.some(card => card.user_id === ADMIN_ACCOUNTS[username]);
-        if (adminExists) {
-          return NextResponse.json(
-            { error: '该管理员账号已存在' },
-            { status: 400 }
-          );
-        }
-      }
     }
 
     const now = new Date();
     
-    // 如果是预定义的管理员账号，使用预定义的用户ID
-    const userId = ADMIN_ACCOUNTS[username] || `user_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
-    const isAdmin = !!ADMIN_ACCOUNTS[username];
+    // Registration must never grant a privileged user ID or role.
+    const userId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    const isAdmin = false;
 
     // 生成体验卡卡密
     const cardKey = `TRIAL-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
@@ -100,7 +88,7 @@ export async function POST(request: NextRequest) {
     const expiresAt = new Date(now.getTime() + expiryDays * 24 * 60 * 60 * 1000);
 
     // 保存密码哈希（用于后续登录验证）
-    const passwordHash = Buffer.from(password + (process.env.PASSWORD_SALT || 'ai-drama-salt')).toString('base64');
+    const passwordHash = await hashPassword(password);
 
     // 创建体验卡记录并直接激活，将用户信息存储在metadata中
     const { error: cardError } = await supabase
@@ -143,7 +131,7 @@ export async function POST(request: NextRequest) {
 
     console.log(`[注册] 用户注册成功: ${username} (${userId})${isAdmin ? ' [管理员]' : ''}`);
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       message: '注册成功',
       user: {
@@ -168,6 +156,7 @@ export async function POST(request: NextRequest) {
         },
       },
     });
+    return await setSessionCookie(response, userId);
 
   } catch (error) {
     console.error('[注册] 处理请求失败:', error);

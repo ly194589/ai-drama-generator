@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isAuthSessionConfigured, setSessionCookie } from '@/lib/auth-session';
 
 /**
  * 开发者登录接口
@@ -7,6 +8,12 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 export async function POST(request: NextRequest) {
   try {
+    if (process.env.NODE_ENV === 'production' || process.env.COZE_PROJECT_ENV === 'PROD') {
+      return NextResponse.json({ error: '生产环境已禁用开发者登录' }, { status: 404 });
+    }
+    if (!isAuthSessionConfigured()) {
+      return NextResponse.json({ error: '服务端未配置登录会话密钥' }, { status: 503 });
+    }
     const { password } = await request.json();
 
     // 从环境变量获取开发者密码
@@ -38,7 +45,7 @@ export async function POST(request: NextRequest) {
     };
 
     // 返回成功响应
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       user: {
         id: sessionData.user_id,
@@ -48,6 +55,7 @@ export async function POST(request: NextRequest) {
         role: sessionData.role,
       },
     });
+    return await setSessionCookie(response, sessionData.user_id);
   } catch (error) {
     console.error('开发者登录失败:', error);
     return NextResponse.json(

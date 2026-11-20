@@ -4,6 +4,7 @@
  * 支持火山引擎(方舟) / MiniMax / 月之暗面(Kimi) / DeepSeek / 百度文心 / 腾讯混元 / 自定义端点
  * 统一走 OpenAI 兼容协议 /chat/completions，密钥与端点均从 user_config 读取
  */
+import { friendlyProviderError } from '@/lib/provider-errors';
 
 export type CompatibleProvider =
   | 'volcengine'
@@ -132,6 +133,7 @@ export async function getCompatibleProviderConfig(
 
   try {
     const { hasDatabaseConfig, getLocalUserConfig } = await import('@/lib/server-config-store');
+    const { decryptSecret } = await import('@/lib/secret-crypto');
     let record: Record<string, unknown> | null = null;
     if (hasDatabaseConfig()) {
       const { getSupabaseClient } = await import('@/storage/database/supabase-client');
@@ -148,10 +150,11 @@ export async function getCompatibleProviderConfig(
     }
 
     if (!record) return null;
-    const apiKey = record[meta.keyField];
+    const storedKey = record[meta.keyField];
     const baseUrl = record[meta.baseUrlField];
 
-    if (typeof apiKey !== 'string' || apiKey.trim().length === 0) return null;
+    const apiKey = typeof storedKey === 'string' ? decryptSecret(storedKey).trim() : '';
+    if (!apiKey) return null;
 
     const resolvedBaseUrl =
       typeof baseUrl === 'string' && baseUrl.trim().length > 0
@@ -195,6 +198,17 @@ export class CompatibleLLMClient {
     return COMPATIBLE_PROVIDERS[this.provider].name;
   }
 
+  /** 记录一次成功调用（仅统计次数，不计费） */
+  private recordUsage(model?: string): void {
+    import('@/lib/model-usage-store')
+      .then(async ({ recordModelUsage }) => {
+        await recordModelUsage(this.userId, this.provider, model || 'default');
+      })
+      .catch(() => {
+        // 统计失败不影响主流程
+      });
+  }
+
   /**
    * 非流式调用
    */
@@ -219,10 +233,12 @@ export class CompatibleLLMClient {
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`[${this.providerName}] 非流式调用失败 ${response.status}:`, errorText.slice(0, 500));
-      throw new Error(`${this.providerName} API 调用失败 (HTTP ${response.status})`);
+      throw new Error(friendlyProviderError(this.providerName, response.status));
     }
 
-    return (await response.json()) as CompatibleChatResponse;
+    const data = (await response.json()) as CompatibleChatResponse;
+    this.recordUsage(options.model || data.model);
+    return data;
   }
 
   /**
@@ -254,7 +270,7 @@ export class CompatibleLLMClient {
             const errorText = await response.text().catch(() => '');
             console.error(`[${this.providerName}] 流式调用失败 ${response.status}:`, errorText.slice(0, 500));
             controller.enqueue(
-              encoder.encode(`data: ${JSON.stringify({ error: `${this.providerName} API 调用失败 (HTTP ${response.status})` })}\n\n`)
+              encoder.encode(`data: ${JSON.stringify({ error: friendlyProviderError(this.providerName, response.status) })}\n\n`)
             );
             controller.close();
             return;
@@ -277,6 +293,7 @@ export class CompatibleLLMClient {
               if (!trimmed.startsWith('data:')) continue;
               const payload = trimmed.slice(5).trim();
               if (payload === '[DONE]') {
+                this.recordUsage(options.model);
                 controller.enqueue(encoder.encode('data: [DONE]\n\n'));
                 controller.close();
                 return;
@@ -293,6 +310,7 @@ export class CompatibleLLMClient {
             }
           }
 
+          this.recordUsage(options.model);
           controller.enqueue(encoder.encode('data: [DONE]\n\n'));
           controller.close();
         } catch (error) {

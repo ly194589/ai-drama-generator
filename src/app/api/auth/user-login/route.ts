@@ -93,6 +93,7 @@ export async function GET(request: NextRequest) {
     
     // 确定套餐类型名称
     const planName = cardRecord.plan_name || (
+      cardRecord.duration_days >= 36500 ? '终身卡' :
       cardRecord.duration_days >= 365 ? '年卡' :
       cardRecord.duration_days >= 90 ? '季卡' : cardRecord.duration_days >= 30 ? '月卡' : '体验卡'
     );

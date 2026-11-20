@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { getSupabaseClient } from '@/storage/database/supabase-client';
 import { hasDatabaseConfig, getLocalUserConfig } from '@/lib/server-config-store';
+import { decryptSecret } from '@/lib/secret-crypto';
 
 /** AI 顾问固定使用的模型 */
 const ADVISOR_MODEL = 'nvidia/nemotron-3-ultra-550b-a55b';
@@ -48,7 +49,7 @@ export async function POST(request: NextRequest) {
       storedBaseUrl = typeof row.nvidia_base_url === 'string' ? row.nvidia_base_url : undefined;
     }
 
-    const apiKey = storedKey || process.env.NVIDIA_API_KEY;
+    const apiKey = decryptSecret(storedKey) || process.env.NVIDIA_API_KEY;
     const baseUrl = storedBaseUrl || process.env.NVIDIA_BASE_URL || 'https://integrate.api.nvidia.com/v1';
 
     if (!apiKey) {

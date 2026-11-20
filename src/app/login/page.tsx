@@ -14,6 +14,7 @@ import {
   Star,
   Crown,
   Gift,
+  Infinity,
   AlertCircle,
   Check,
   Copy,
@@ -41,32 +42,39 @@ interface Plan {
 const defaultPlans: Plan[] = [
   {
     type: 'trial',
-    name: '体验卡',
+    name: '7天体验卡',
     price: 0,
     durationDays: 7,
-    description: '免费体验，新用户专享',
+    description: '免费体验，不限次数',
   },
   {
     type: 'monthly',
     name: '月卡',
-    price: 29.9,
+    price: 19.9,
     durationDays: 30,
-    description: '适合个人创作者',
+    description: '轻度创作首选',
   },
   {
     type: 'quarterly',
     name: '季卡',
-    price: 79,
+    price: 39.9,
     durationDays: 90,
-    description: '超值选择，省11%',
+    description: '平均每月13.3元，省33%',
     popular: true,
   },
   {
     type: 'yearly',
     name: '年卡',
-    price: 199,
+    price: 109,
     durationDays: 365,
-    description: '最佳性价比，省44%',
+    description: '平均每月9.1元，省54%',
+  },
+  {
+    type: 'lifetime',
+    name: '终身卡',
+    price: 298,
+    durationDays: 36500,
+    description: '一次买断，不再续费',
   },
 ];
 
@@ -96,6 +104,37 @@ function LoginPageContent() {
   const [orderNo, setOrderNo] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
+
+  useEffect(() => {
+    if (searchParams.get('oauth_success') !== 'true') return;
+
+    const restoreOAuthSession = async () => {
+      try {
+        const response = await fetch('/api/auth/me');
+        const data = await response.json();
+        if (!response.ok || !data.user?.id) throw new Error('OAuth会话无效，请重新登录');
+
+        const user = { ...data.user, name: 'Coze用户' };
+        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem('oauth_provider', 'coze');
+        const subscriptionResponse = await fetch('/api/auth/subscription');
+        const subscriptionData = await subscriptionResponse.json();
+        if (!subscriptionData.authorized) {
+          setErrorMessage('Coze登录成功，但账号没有有效订阅，请先激活卡密或联系管理员。');
+          setIsChecking(false);
+          return;
+        }
+
+        localStorage.setItem('subscription', JSON.stringify(subscriptionData.subscription));
+        router.replace('/');
+      } catch (error) {
+        setErrorMessage(error instanceof Error ? error.message : 'OAuth登录失败，请重试');
+        setIsChecking(false);
+      }
+    };
+
+    void restoreOAuthSession();
+  }, [router, searchParams]);
   
   // 登录/注册表单
   const [username, setUsername] = useState('');
@@ -123,6 +162,13 @@ function LoginPageContent() {
         const data = await response.json();
 
         if (data.authorized) {
+          const requestedPlan = searchParams.get('plan');
+          const plan = requestedPlan && plans.find((item) => item.type === requestedPlan);
+          if (plan) {
+            setIsChecking(false);
+            void handleSelectPlan(plan);
+            return;
+          }
           router.replace('/');
           return;
         }
@@ -133,7 +179,7 @@ function LoginPageContent() {
     };
 
     checkAuth();
-  }, [router]);
+  }, [router, searchParams, plans]);
 
   // 处理过期跳转提示
   useEffect(() => {
@@ -190,47 +236,6 @@ function LoginPageContent() {
     setErrorMessage('');
 
     try {
-      // 先检查是否是管理员账号
-      const ADMIN_USERNAME = 'admin';
-      const ADMIN_PASSWORD = 'ai-drama-admin-2024';
-
-      if (username.trim() === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-        console.log('[登录] 检测到管理员登录');
-
-        // 创建管理员用户对象
-        const adminUser = {
-          id: 'admin',
-          username: 'admin',
-          isAdmin: true,
-        };
-
-        // 保存管理员用户信息
-        localStorage.setItem('user', JSON.stringify(adminUser));
-        localStorage.setItem('subscription', JSON.stringify({
-          planType: 'admin',
-          planName: '管理员',
-          activatedAt: new Date().toISOString(),
-          expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-          durationDays: 365,
-          remainingDays: 365,
-        }));
-
-        console.log('[登录] 已存储管理员信息到 localStorage');
-
-        toast.success('管理员登录成功！');
-
-        console.log('[登录] 准备跳转到首页');
-
-        // 延迟跳转，确保 toast 显示
-        setTimeout(() => {
-          console.log('[登录] 执行跳转到首页');
-          router.push('/');
-        }, 500);
-
-        setIsLoading(false);
-        return;
-      }
-
       // 普通用户登录
       const response = await fetch('/api/auth/login', {
         method: 'POST',
@@ -252,6 +257,12 @@ function LoginPageContent() {
       localStorage.setItem('oauth_provider', 'password');
 
       toast.success('登录成功！');
+      const requestedPlan = searchParams.get('plan');
+      const plan = requestedPlan && plans.find((item) => item.type === requestedPlan);
+      if (plan) {
+        await handleSelectPlan(plan);
+        return;
+      }
       router.push('/');
     } catch (error) {
       console.error('登录失败:', error);
@@ -312,6 +323,12 @@ function LoginPageContent() {
       localStorage.setItem('oauth_provider', 'password');
 
       toast.success('注册成功！已为您开通体验卡');
+      const requestedPlan = searchParams.get('plan');
+      const plan = requestedPlan && plans.find((item) => item.type === requestedPlan);
+      if (plan) {
+        await handleSelectPlan(plan);
+        return;
+      }
       router.push('/');
     } catch (error) {
       console.error('注册失败:', error);
@@ -552,7 +569,7 @@ function LoginPageContent() {
                 <p className="text-[10px] text-muted-foreground mt-1">
                   {authMode === 'login' 
                     ? '登录后即可使用平台功能' 
-                    : '注册即送7天体验卡（1剧本/5视频/20图）'}
+                    : '注册即送7天体验卡，全功能不限次数'}
                 </p>
               </div>
 
@@ -725,10 +742,13 @@ function LoginPageContent() {
                     <div className="flex items-center gap-2">
                       <div className={cn(
                         "w-7 h-7 rounded-md flex items-center justify-center shrink-0",
+                        plan.type === 'lifetime' ? "bg-rose-500/20" :
                         plan.type === 'yearly' ? "bg-amber-500/20" :
                         plan.type === 'quarterly' ? "bg-blue-500/20" : "bg-green-500/20"
                       )}>
-                        {plan.type === 'yearly' ? (
+                        {plan.type === 'lifetime' ? (
+                          <Infinity className="w-3.5 h-3.5 text-rose-600" />
+                        ) : plan.type === 'yearly' ? (
                           <Crown className="w-3.5 h-3.5 text-amber-600" />
                         ) : plan.type === 'quarterly' ? (
                           <Gift className="w-3.5 h-3.5 text-blue-600" />
@@ -798,7 +818,9 @@ function LoginPageContent() {
               <div className="p-3 rounded-lg bg-muted/30 border border-border/50">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    {selectedPlan.type === 'yearly' ? (
+                    {selectedPlan.type === 'lifetime' ? (
+                      <Infinity className="w-4 h-4 text-rose-600" />
+                    ) : selectedPlan.type === 'yearly' ? (
                       <Crown className="w-4 h-4 text-amber-600" />
                     ) : selectedPlan.type === 'quarterly' ? (
                       <Gift className="w-4 h-4 text-blue-600" />

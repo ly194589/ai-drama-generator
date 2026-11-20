@@ -32,28 +32,12 @@ const ADMIN_USER_IDS = [
 ];
 
 /**
- * 从请求头获取用户ID
+ * 获取经过认证中间件写入的用户ID。
+ * 不再解码或信任客户端提交的 Bearer 内容。
  */
 export function getUserIdFromRequest(request: NextRequest): string | null {
-  // 优先从自定义请求头获取
   const userId = request.headers.get('x-user-id');
-  if (userId && userId !== 'dev-user') {
-    return userId;
-  }
-  
-  // 尝试从Authorization头获取
-  const authHeader = request.headers.get('authorization');
-  if (authHeader?.startsWith('Bearer ')) {
-    try {
-      const token = authHeader.slice(7);
-      const payload = JSON.parse(Buffer.from(token, 'base64url').toString());
-      return payload.user_id || payload.sub;
-    } catch {
-      // ignore
-    }
-  }
-  
-  return null;
+  return userId || null;
 }
 
 /**

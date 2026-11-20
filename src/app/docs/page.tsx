@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, type ReactNode } from 'react';
+import { useState, useEffect, useMemo, type ReactNode } from 'react';
 import Link from 'next/link';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -20,9 +20,13 @@ import {
   FileText,
   Search,
   Settings as SettingsIcon,
-  Star,
   Mail,
   Lightbulb,
+  KeyRound,
+  Plus,
+  Trash2,
+  Loader2,
+  ShieldCheck,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -48,11 +52,11 @@ const sections = [
     icon: Rocket,
     description: '从零开始，5 分钟上手 AI 短剧生成器',
     items: [
-      { title: '介绍', content: 'AI 短剧生成器是一个基于 AI 的短剧创作平台，支持从剧本生成、分镜设计、人物立绘、场景生成、配音合成到视频生成的全流程自动化创作。\n\n核心特性：\n- 全流程 AI 创作：剧本 → 分镜 → 立绘 → 场景 → 配音 → 视频\n- 多模型支持：兼容 Coze、NVIDIA、智谱、千问等主流模型\n- 可视化编辑：所见即所得的编辑器，实时预览\n- 团队协作：多角色协作，版本管理与回滚' },
-      { title: '安装部署', content: '### 环境要求\n- Node.js 18+\n- pnpm 8+\n- PostgreSQL 15+（或 Supabase）\n- 对象存储（S3 兼容）\n\n### 快速安装\n```bash\ngit clone https://github.com/your-org/ai-drama.git\ncd ai-drama\npnpm install\ncp .env.example .env.local\npnpm db:push\npnpm dev\n```\n\n### Docker 部署\n```bash\ndocker compose up -d\n```' },
+      { title: '介绍', content: 'AI 短剧生成器是一个基于 AI 的短剧创作平台，支持从剧本生成、分镜设计、人物立绘、场景生成、配音合成到视频生成的全流程自动化创作。\n\n核心特性：\n- 全流程 AI 创作：剧本 → 分镜 → 立绘 → 场景 → 配音 → 视频\n- 模型自由：自带 API Key 接入智谱、通义千问、火山引擎、MiniMax、Moonshot、DeepSeek、文心一言、腾讯混元、NVIDIA 9 家平台，另支持任意 OpenAI 兼容自定义端点\n- 不卖 token：只收网站使用费，套餐有效期内不限生成次数，模型费用走自己的 Key\n- Skill 市场：把成熟短剧流程打包成可复用 Skill，一键套用到创作\n- 开放 API：`/api/v1` 支持外部系统调用 Skill 与读取剧集\n- 可视化编辑：所见即所得的编辑器，实时预览' },
+      { title: '账号与套餐', content: '### 注册与体验\n注册账号即获得 7 天体验卡，期内全流程不限次数。\n\n### 套餐\n| 套餐 | 价格 | 有效期 |\n|------|------|--------|\n| 7 天体验卡 | 免费 | 7 天 |\n| 月卡 | ¥19.9 | 30 天 |\n| 季卡 | ¥39.9 | 90 天 |\n| 年卡 | ¥109 | 365 天 |\n| 终身卡 | ¥298 | 长期有效 |\n\n套餐只收网站使用费，有效期内不限生成次数；模型费用由你自己的 API Key 直接结算给厂商。年卡与终身卡额外解锁 Pro Skill 与开放 API。' },
       { title: '5 分钟上手', content: '### 完整流程\n1. **新建项目**：点击"开始创作" → "新建剧集"\n2. **输入创意**：描述核心故事（如："穿越回古代的程序员用代码思维破解宫廷阴谋"）\n3. **AI 生成**：点击"生成剧本"，1-2 分钟获得完整大纲\n4. **微调剧本**：编辑器中调整情节、角色、台词\n5. **生成分镜**：一键生成分镜脚本\n6. **角色立绘**：为主要角色生成三视图\n7. **场景生成**：为每个分镜生成场景图\n8. **配音合成**：选择音色，批量生成配音\n9. **视频生成**：选择模型，生成并合成成片\n10. **导出分享**：下载或一键发布' },
-      { title: '基础配置', content: '### 环境变量\n| 变量名 | 说明 | 必填 |\n|--------|------|------|\n| `DATABASE_URL` | PostgreSQL 连接字符串 | ✅ |\n| `SUPABASE_URL` | Supabase 项目 URL | ✅ |\n| `SUPABASE_SERVICE_ROLE_KEY` | Supabase 服务端密钥 | ✅ |\n| `OSS_ENDPOINT` | 对象存储 Endpoint | ✅ |\n| `OSS_ACCESS_KEY` | 对象存储 Access Key | ✅ |\n| `OSS_SECRET_KEY` | 对象存储 Secret Key | ✅ |\n| `OSS_BUCKET` | 存储桶名称 | ✅ |\n| `COZE_API_KEY` | Coze API Key | ✅ |\n\n### 模型配置\n在"设置 > 模型配置"中配置文本/图像/视频/音频模型参数。' },
-      { title: '界面导览', content: '### 布局结构\n- 左侧：全局导航（创作 / 素材库 / 设置）\n- 顶部：项目切换与全局搜索\n- 中部：工作区（剧本 / 分镜 / 素材 / 预览）\n\n### 常用入口\n| 功能 | 路径 |\n|------|------|\n| 剧本生成 | 剧集创作 > 新建剧集 |\n| 分镜设计 | 剧集创作 > 分镜 |\n| 素材库 | 图像 / 视频 / 音频 |\n| 模型设置 | 设置 > 模型设置 |\n| AI 顾问 | 侧边栏 > AI 顾问 |' },
+      { title: '模型接入（自带 Key）', content: '### 支持的平台\n智谱、通义千问、火山引擎（豆包）、MiniMax、Moonshot（Kimi）、DeepSeek、文心一言、腾讯混元、NVIDIA，以及任意 OpenAI 兼容的自定义端点。\n\n### 配置步骤\n1. 进入「设置 > 模型接入」\n2. 选择厂商，填入 API Key（自定义端点还需填写 Base URL）\n3. 点击「测试连接」确认可用\n4. 保存后，剧本 / 图片 / 视频 / 配音会按所选厂商与模型调用\n\n### 安全说明\nKey 在服务端加密存储，接口只回显掩码；可随时替换或删除，删除后立即失效。模型调用费用由厂商直接结算，平台不抽成。' },
+      { title: '界面导览', content: '### 布局结构\n- 左侧：全局导航（创作 / Skill 市场 / 素材库 / 设置）\n- 中部：工作区（剧本 / 分镜 / 素材 / 预览）\n\n### 常用入口\n| 功能 | 路径 |\n|------|------|\n| 剧本生成 | 剧本创作 > 新建剧本 |\n| 分镜设计 | 剧本创作 > 分镜 |\n| Skill 市场 | 侧边栏 > Skill 市场 |\n| 素材库 | 图片 / 视频 / 音频管理 |\n| 模型接入 | 设置 > 模型接入 |\n| 开放 API | 文档站 > API 参考 |' },
     ],
   },
   {
@@ -61,50 +65,74 @@ const sections = [
     icon: BookOpen,
     description: '理解剧集、分镜、立绘、场景等核心概念',
     items: [
-      { title: '剧集管理', content: '### 功能\n- 创建：标题、题材、集数、风格、标签\n- 编辑：剧本、分镜、角色、场景统一管理\n- 版本控制：自动保存历史，支持回滚\n- 协作：邀请成员、分配角色（编剧/导演/审核）\n\n### 状态流转\n`草稿` → `编剧中` → `分镜中` → `生产中` → `审核中` → `已完成`\n\n### 导出格式\nJSON / PDF / Markdown / SRT' },
+      { title: '剧集管理', content: '### 功能\n- 创建：标题、题材、风格、图片风格、集数、核心冲突\n- 编辑：剧本、分镜、角色、场景统一管理\n- 状态：草稿 → 编剧中 → 分镜中 → 已完成\n\n### 导出\n剧本与分镜支持复制，或导出为文本 / Markdown 使用。' },
       { title: '分镜设计', content: '### 分镜结构\n- 镜头序号、场景描述、镜头类型（全景/中景/特写/极特写）\n- 运镜方式（固定/推拉/摇移/跟随/升降/旋转）\n- 时长、台词/旁白、音效提示、AI 提示词\n\n### 批量操作\n- 一键 AI 生成全剧分镜\n- 批量修改镜头类型/运镜\n- 导出分镜表（Excel/PDF）' },
-      { title: '人物立绘', content: '### 三视图生成\n- 正面：正脸特写，用于对白场景\n- 侧面：侧脸轮廓，用于侧身镜头\n- 背面：背部造型，用于背影镜头\n\n### 参数控制\n- 风格：写实/动漫/赛博朋克/水彩/油画等\n- 分辨率：512x512 到 2048x2048\n- 一致性种子、ControlNet 姿势控制\n\n### 管理功能\n- 角色标签分类、版本历史对比、批量重新生成' },
+      { title: '人物立绘', content: '### 风格\n- 真人风：写实摄影质感，适合都市 / 言情题材\n- 漫画风：二次元线条与色彩，适合漫改 / 奇幻题材\n\n### 一致性\n- 角色档案记录外貌、服装与标志性特征\n- 立绘与分镜复用同一套角色描述，减少换脸\n- 支持单角色重新生成，不影响其他角色' },
       { title: '场景生成', content: '### 场景类型\n- 室内：客厅/卧室/办公室/宫殿/实验室等\n- 室外：街道/公园/森林/沙漠/太空/古城等\n- 特殊：梦境/记忆/虚拟/抽象概念可视化\n\n### 生成参数\n- 时段：白天/黄昏/夜晚/凌晨\n- 天气：晴/雨/雪/雾/阴天\n- 光影：自然光/影棚光/体积光/赛博光效\n- 构图：黄金分割/对称/对角线/框架式\n\n### 批量生成\n按分镜批量生成，自动匹配环境要素。' },
-      { title: '配音与音色', content: '### 音色库\n- 按性别/年龄/气质分类：少女/御姐/青年/磁性男/童声\n- 智能匹配：`/api/audio/smart-tts` 按角色档案自动选择\n\n### 一致性规则\n- 每角色固定音色 ID，全剧不变\n- 语速 1.1 倍，情绪按剧本标签\n- 响度：人声 -16 LUFS，BGM -24 LUFS\n\n### 口型同步\n对话镜头必须传 `audioUrl`，使用带配音的视频生成模式。' },
-      { title: '视频合成', content: '### 生成模式\n- 文生视频：场景/空镜\n- 图生视频：角色立绘作首帧，保证不换脸\n- 带配音模式：传 audioUrl 实现口型同步\n\n### 参数约束\n| 参数 | 范围 | 说明 |\n|------|------|------|\n| duration | 4-12 秒 | API 硬限制 |\n| prompt | ≤2000 字符 | 超限返回 403 |\n| 调用间隔 | ≥30 秒 | 频控保护 |\n\n### 合成\n生成后按分镜顺序自动合成，叠加字幕/BGM/转场。' },
+      { title: '配音与音色', content: '### 音色库\n- 按性别 / 年龄 / 气质分类：少女 / 御姐 / 青年 / 磁性男 / 童声\n- 智能匹配：`/api/audio/smart-tts` 按角色档案自动选择\n\n### 一致性规则\n- 每角色固定音色 ID，全剧不变\n- 语速 1.1 倍，情绪按剧本标签\n- 响度：人声 -16 LUFS，BGM -24 LUFS' },
+      { title: '视频合成', content: '### 生成模式\n- 文生视频：场景 / 空镜\n- 图生视频：以角色立绘或场景图作首帧，保持画面一致\n\n### 说明\n- 生成时长与分辨率由所选模型能力决定\n- 平台内置模型按代运行服务计费；使用自带 Key 时由厂商直接结算\n- 成片可在「视频管理」中预览、下载或再次合成' },
     ],
   },
   {
     id: 'api-reference',
     title: 'API 参考',
     icon: Code,
-    description: '完整的 API 接口文档与调用示例',
+    description: '开放 API 鉴权、端点、示例与错误码',
     items: [
-      { title: '认证授权', content: '### API Key 认证\n```\nAuthorization: Bearer YOUR_API_KEY\n```\n\n### 获取 API Key\n1. 登录控制台 → 设置 → API Key\n2. 点击"生成新 Key"\n3. 复制并妥善保存（仅显示一次）\n\n### 权限范围\n| Key 类型 | 权限 |\n|----------|------|\n| 只读 | GET 所有资源 |\n| 读写 | 所有 CRUD 操作 |\n| 管理员 | 包括用户管理、计费、系统配置 |\n\n### 速率限制\n- 免费版：60 req/min\n- 专业版：300 req/min\n- 企业版：1000 req/min\n\n超限返回 `429`，响应头含 `Retry-After`。' },
-      { title: '剧集 API', content: '### 创建剧集\n```http\nPOST /api/v1/dramas\nAuthorization: Bearer YOUR_API_KEY\nContent-Type: application/json\n\n{\n  "title": "剧集标题",\n  "genre": "悬疑",\n  "episodes": 6,\n  "style": "cinematic",\n  "tags": ["AI", "短剧"]\n}\n```\n\n### 获取列表\n`GET /api/v1/dramas?page=1&pageSize=20&status=completed`\n\n### 获取详情\n`GET /api/v1/dramas/{id}`\n\n### 更新\n`PATCH /api/v1/dramas/{id}`\n\n### 删除\n`DELETE /api/v1/dramas/{id}`' },
-      { title: '生成任务 API', content: '### 创建任务\n```http\nPOST /api/v1/generation-tasks\nContent-Type: application/json\n\n{\n  "type": "script|storyboard|character|scene|audio|video",\n  "drama_id": "drama-uuid",\n  "params": {}\n}\n```\n\n### 查询状态\n`GET /api/v1/generation-tasks/{id}`\n\n响应示例：\n```json\n{\n  "id": "task-uuid",\n  "type": "video",\n  "status": "completed",\n  "progress": 100,\n  "result": {\n    "video_url": "https://oss.xxx/video.mp4",\n    "duration": 8.5\n  },\n  "created_at": "2024-01-15T10:30:00Z"\n}\n```' },
-      { title: '素材 API', content: '### 图片素材\n`GET /api/v1/images?type=character|scene&page=1`\n\n### 批量生成\n```http\nPOST /api/v1/images/batch-generate\n{\n  "characters": ["char-uuid"],\n  "style": "cinematic",\n  "reference_url": "https://oss.xxx/ref.png"\n}\n```\n\n### 视频/音频\n`GET /api/v1/videos` / `GET /api/v1/audios`\n\n所有素材接口按 `user_id` 隔离，未登录返回 401。' },
-      { title: '错误码', content: '### 常见错误码\n| 状态码 | 含义 | 处理 |\n|--------|------|------|\n| 401 | 未登录/Key 无效 | 检查 Authorization |\n| 403 | 频控或参数超限 | 间隔≥30s，prompt≤2000 |\n| 404 | 资源不存在 | 检查 id 与权限 |\n| 429 | 速率限制 | 按 Retry-After 重试 |\n| 500 | 服务端错误 | 查看日志并重试 |\n\n### 重试策略\n指数退避：1s → 2s → 4s，最多 3 次；幂等接口可安全重试。' },
+      {
+        title: '认证与 API Key',
+        content:
+          '### 鉴权方式\n所有 `/api/v1` 接口使用 API Key 鉴权，Key 与账号绑定，数据严格按账号隔离。\n\n```http\nAuthorization: Bearer sk_live_xxxxxxxx\n```\n\n### 获取 API Key\n1. 登录后进入「文档中心 > API 参考」\n2. 在下方「我的 API Key」中点击「创建 Key」\n3. 立即复制保存，明文只显示一次\n\n### 安全建议\n- Key 只放在服务端环境变量中，不要提交到仓库或写进前端代码\n- 泄露后立即在文档中心吊销\n- 不同业务线使用不同 Key，便于追踪与单独吊销',
+      },
+      {
+        title: 'Skill API',
+        content:
+          '### 获取 Skill 列表\n`GET /api/v1/skills`\n\n返回 id、名称、分类、参数定义、`licensed`（是否已授权）与 `requiresLicense`，不返回 Prompt 正文。\n\n### 领取授权（必须先做）\n```http\nPOST /api/v1/skills/{id}/license\nAuthorization: Bearer sk_live_xxx\n```\n\n幂等接口，重复调用返回同一授权编号。Pro Skill 需要年卡 / 终身卡，否则返回 `403 PLAN_REQUIRED`。\n\n### 渲染 Skill\n```http\nPOST /api/v1/skills/{id}/render\nAuthorization: Bearer sk_live_xxx\nContent-Type: application/json\n\n{\n  "params": { "hero": "集团总裁", "conflict": "一纸契约婚姻" }\n}\n```\n\n响应包含 `prompt`（完整提示词）、`storyboardRules`（分镜规则）与 `series`（可直接写入新建剧本的字段）。未领取授权时返回 `403 LICENSE_REQUIRED`。\n\n### 可用 Skill\n| ID | 名称 | 权限 |\n|----|------|------|\n| `ba-zong-tian-chong-30` | 霸总甜宠 · 30集闭环 | 免费 |\n| `shuang-ju-hook` | 爽剧开场 · 7秒钩子 | 免费 |\n| `chong-sheng-fu-chou-60` | 重生复仇 · 60集长线 | Pro |\n| `xuan-yi-fan-zhuan` | 悬疑强反转 | Pro |\n| `chu-hai-ben-di-hua` | 出海短剧本地化 | Pro |\n| `ren-wu-xiao-zhuan` | 爆款人物小传 | Pro |',
+      },
+      {
+        title: '账号与用量 API',
+        content:
+          '### 账号信息\n`GET /api/v1/me`\n\n返回当前套餐、Skill 授权数量、Key 掩码与剩余限流额度。\n\n### 按模型用量\n`GET /api/v1/usage`\n\n返回每个模型的调用次数与最近使用时间，仅用于统计，不参与计费。',
+      },
+      {
+        title: '剧集 API',
+        content:
+          '### 获取剧集列表\n```http\nGET /api/v1/dramas?limit=20&offset=0&status=writing\nAuthorization: Bearer sk_live_xxx\n```\n\n只返回当前账号的剧集。`limit` 最大 50，`status` 可选：`draft` / `outlining` / `writing` / `completed`。',
+      },
+      {
+        title: '调用示例',
+        content:
+          '### cURL\n```bash\ncurl -X POST https://aiduanju.coze.site/api/v1/skills/shuang-ju-hook/render \\\n  -H "Authorization: Bearer $DRAMA_API_KEY" \\\n  -H "Content-Type: application/json" \\\n  -d \'{"params":{"hero":"被辞退的项目经理","counter":"收购方代表"}}\'\n```\n\n### JavaScript\n```js\nconst res = await fetch(\'https://aiduanju.coze.site/api/v1/skills/shuang-ju-hook/render\', {\n  method: \'POST\',\n  headers: {\n    Authorization: `Bearer ${process.env.DRAMA_API_KEY}`,\n    \'Content-Type\': \'application/json\',\n  },\n  body: JSON.stringify({ params: { hero: \'被辞退的项目经理\' } }),\n});\n\nconst { data } = await res.json();\nconsole.log(data.prompt);\n```',
+      },
+      {
+        title: '错误码与限流',
+        content:
+          '### 错误码\n统一响应体：`{ "error": { "code": "...", "message": "..." } }`\n\n| 状态码 | code | 说明 |\n|--------|------|------|\n| 401 | `MISSING_API_KEY` | 未携带 Authorization 头 |\n| 401 | `INVALID_API_KEY` | Key 无效或已吊销 |\n| 403 | `LICENSE_REQUIRED` | 未领取该 Skill 授权 |\n| 403 | `PLAN_REQUIRED` | Pro Skill 需要年卡 / 终身卡 |\n| 404 | `SKILL_NOT_FOUND` | Skill id 不存在 |\n| 429 | `RATE_LIMITED` | 超出限流，按 Retry-After 重试 |\n| 500 | `INTERNAL_ERROR` | 服务端异常 |\n| 502 | `UPSTREAM_ERROR` | 上游数据读取失败 |\n\n### 限流\n- 每个 API Key 60 次/分钟（令牌桶，平滑补充）\n- 超限返回 `429`，响应头含 `Retry-After`（秒）\n- 达到 429 时应指数退避重试，不要立即重发\n\n### 跨域（CORS）\n`/api/v1` 已允许任意来源的浏览器请求（不使用 Cookie，鉴权只靠 Bearer），并已处理 `OPTIONS` 预检。生产环境仍建议由服务端调用，避免 Key 暴露在前端。',
+      },
     ],
   },
   {
     id: 'integration',
-    title: '插件与集成',
+    title: '集成与接入',
     icon: Layers,
-    description: '插件系统、第三方集成、贡献指南与更新日志',
+    description: '开放 API 集成、模型平台与支持渠道',
     items: [
-      { title: '插件系统', content: '### 插件架构\n- 基于事件总线：`onDramaCreated`、`onTaskCompleted` 等钩子\n- 沙箱隔离：WASM / Worker 运行非受信代码\n- 权限模型：声明式权限，最小权限原则\n\n### 插件开发\n```typescript\nimport { registerPlugin } from \'@ai-drama/plugin-sdk\';\n\nregisterPlugin({\n  id: \'my-plugin\',\n  name: \'我的插件\',\n  hooks: {\n    onDramaCreated: async (ctx) => {\n      console.log(\'剧集创建:\', ctx.dramaId);\n    },\n  },\n});\n```' },
-      { title: '第三方集成', content: '### 已支持集成\n| 服务 | 用途 | 配置位置 |\n|------|------|----------|\n| Coze | LLM / 工作流 | 设置 > 模型配置 |\n| NVIDIA Nemotron | 文本生成 | 设置 > 模型配置 |\n| 智谱 AI | 多模态 | 设置 > 模型配置 |\n| 阿里云千问 | 文本/视觉 | 设置 > 模型配置 |\n| S3 兼容存储 | 素材存储 | 设置 > 存储配置 |' },
-      { title: '贡献指南', content: '### 如何贡献\n1. Fork 本仓库\n2. 创建特性分支 (`git checkout -b feature/xxx`)\n3. 提交更改 (`git commit -m \'feat: xxx\'`)\n4. 推送分支 (`git push origin feature/xxx`)\n5. 打开 Pull Request\n\n### 开发规范\n- 代码风格：ESLint + Prettier\n- 提交信息：Conventional Commits\n- 测试：pnpm test' },
-      { title: 'Webhook 通知', content: '### 事件类型\n- `drama.completed`：剧集合成完成\n- `task.failed`：生成任务失败\n- `quota.low`：额度低于 10%\n\n### 配置\n```http\nPOST /api/v1/webhooks\n{\n  "url": "https://your-server/hook",\n  "events": ["drama.completed", "task.failed"],\n  "secret": "whsec_xxx"\n}\n```\n\n### 签名校验\n请求头 `X-Signature` = HMAC-SHA256(body, secret)；失败重试 3 次（1m/5m/30m）。' },
+      { title: '集成准备', content: '### 三步接入\n1. 在「我的 API Key」创建一把 Key（明文只显示一次）\n2. 用 `GET /api/v1/me` 确认 Key 有效并查看当前套餐\n3. 按业务调用 `/api/v1/skills`、`/api/v1/skills/{id}/license`、`/api/v1/skills/{id}/render`\n\n### 建议\n- 每个业务线单独一把 Key，便于统计与单独吊销\n- Key 只放服务端环境变量，不要写进前端代码\n- 年卡 / 终身卡才能调用 Pro Skill 与开放 API' },
+      { title: '支持的模型平台', content: '### 可在「设置 > 模型接入」中配置\n| 平台 | 覆盖能力 |\n|------|----------|\n| 智谱 AI | 文本 / 图像 / 视频 |\n| 通义千问 | 文本 / 视觉 / 图像 |\n| 火山引擎（豆包） | 文本 / 图像 / 视频 |\n| MiniMax | 文本 / 语音 |\n| Moonshot（Kimi） | 文本 |\n| DeepSeek | 文本 |\n| 文心一言 | 文本 |\n| 腾讯混元 | 文本 |\n| NVIDIA | 文本 |\n| 自定义 | 任意 OpenAI 兼容端点 |\n\n每个厂商独立保存 Key 与 Base URL，互不影响；未配置的厂商自动回退到平台内置模型。' },
+      { title: '反馈与支持', content: '### 遇到问题\n- 先查「帮助中心」的常见问题\n- 接口问题请附上请求时间、端点与返回的 `code`，便于定位\n- 套餐与发票问题在「个人中心 > 订阅管理」处理\n\n### 联系渠道\n- 邮箱：contact@aidrama.com\n- 服务时间：7x24 小时\n- 企业采购与定制：邮件说明需求与规模' },
+      { title: '外部接入场景', content: '### 可以把平台当作能力层\n- 自有系统调用 `/api/v1/skills/{id}/render` 拿 Prompt 与分镜规则，接入自己的内容流水线\n- 用 `/api/v1/dramas` 拉取账号下的剧集与状态，做数据看板\n- 用 `/api/v1/usage` 监控各模型调用量，评估成本结构\n\n### 模型接入方式\n| 方式 | 说明 |\n|------|------|\n| 自带 Key（BYOK） | 在「设置 > 模型接入」填写厂商 Key，套餐内不限次数，模型费直付厂商 |\n| 平台内置模型 | 无需配置，由平台代运行，按代运行服务单独计费 |\n\n### 接入建议\n1. 先用免费 Skill 跑通链路，再按业务需要开通 Pro Skill\n2. Key 只放服务端，按环境区分（测试 / 生产各一把）\n3. 对 429 做指数退避，对 401 做告警而不是重试' },
     ],
   },
   {
     id: 'deployment',
-    title: '部署运维',
+    title: '服务与支持',
     icon: Zap,
-    description: 'Docker 部署、监控告警、性能优化与故障排查',
+    description: '服务状态、问题排查与数据说明',
     items: [
-      { title: 'Docker 部署', content: '### docker-compose.yml\n```yaml\nversion: \'3.8\'\nservices:\n  app:\n    image: ai-drama:latest\n    ports:\n      - "5000:5000"\n    environment:\n      - DATABASE_URL=postgresql://...\n      - SUPABASE_URL=...\n      - OSS_ENDPOINT=...\n    volumes:\n      - ./uploads:/app/uploads\n```' },
-      { title: '监控告警', content: '### 健康检查\n`GET /api/health` 返回服务状态\n\n### 日志收集\n- 应用日志：`/app/work/logs/bypass//app.log`\n- 错误日志：`/app/work/logs/bypass//dev.log`\n- 控制台日志：`/app/work/logs/bypass//console.log`' },
-      { title: '故障排查', content: '### 常见问题\n| 问题 | 原因 | 解决方案 |\n|------|------|----------|\n| 接口 500 | Supabase 嵌套查询失败 | 改为两次查询组装 |\n| 生成卡死 | 任务队列阻塞 | 检查后台任务状态 |\n| 图片不显示 | OSS 配置错误 | 检查 Endpoint 和密钥 |' },
-      { title: '性能优化', content: '### 生成侧\n- 角色/场景/配音并行生成，DAG 调度\n- 无对话镜头每 4 个合并生成，减少调用\n- 预览用 480p，定稿再出 1080p\n\n### 前端侧\n- 图片 `loading="lazy" decoding="async"`\n- 视频 `preload="metadata"`\n- LLM 输出走 SSE 流式，首字延迟更低\n- 静态素材走 CDN 缓存' },
-      { title: '备份与恢复', content: '### 数据备份\n- Supabase 自动备份，保留 7 天\n- 关键表每日 `pg_dump` + WAL 归档\n- 素材对象存储开启版本控制与跨区域复制\n\n### 恢复目标\n| 指标 | 目标 |\n|------|------|\n| RTO | ≤4 小时 |\n| RPO | ≤24 小时 |\n\n### 演练\n每季度做一次恢复演练，验证备份可用性。' },
+      { title: '服务状态', content: '### 健康检查\n`GET /api/health` 返回服务状态，可用于外部监控。\n\n### 状态说明\n接口不可用时会返回统一错误体，包含 `code` 与 `message`；持续异常请通过下方渠道反馈。' },
+      { title: '常见问题排查', content: '### 接口返回\n| 现象 | 可能原因 | 处理方式 |\n|------|----------|----------|\n| 401 未登录 | 会话过期 | 重新登录 |\n| 401 INVALID_API_KEY | Key 被吊销或复制错误 | 在文档中心重新创建 |\n| 403 PLAN_REQUIRED | 套餐不支持 Pro Skill | 升级年卡 / 终身卡 |\n| 429 RATE_LIMITED | 超过 60 次/分钟 | 按 Retry-After 退避 |\n| 生成失败 | 模型 Key 无效或余额不足 | 在设置中「测试连接」并检查厂商余额 |\n| 图片 / 视频打不开 | 素材仍在生成或链接过期 | 稍后重试或重新生成 |' },
+      { title: '数据与隐私', content: '### 存储\n- 账号与项目数据存储在 Supabase\n- 图片 / 视频 / 音频存储在对象存储\n- 模型 API Key 加密存储，仅服务端调用\n\n### 删除\n删除剧集或素材后不可恢复；如需彻底删除账号数据，请通过支持邮箱申请。' },
+      { title: '联系我们', content: '### 支持渠道\n- 邮箱：contact@aidrama.com\n- 服务时间：7x24 小时\n- 帮助中心：站内「帮助中心」页面\n\n### 反馈建议\n描述使用场景与期望效果，我们会评估是否纳入产品规划。' },
     ],
   },
   {
@@ -289,6 +317,192 @@ function MarkdownContent({ content }: { content: string }) {
 }
 
 // ============================================================================
+// API Key 管理（开放 API 凭证）
+// ============================================================================
+interface ApiKeyItem {
+  id: string;
+  name: string;
+  maskedKey: string;
+  createdAt: string;
+  lastUsedAt?: string;
+}
+
+function ApiKeyManager() {
+  const [userId, setUserId] = useState('');
+  const [keys, setKeys] = useState<ApiKeyItem[]>([]);
+  const [name, setName] = useState('');
+  const [plaintext, setPlaintext] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('user');
+      const parsed = raw ? (JSON.parse(raw) as { id?: string }) : null;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      if (parsed?.id) setUserId(parsed.id);
+    } catch {
+      // 本地数据损坏时按未登录处理
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!userId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/keys', { headers: { 'x-user-id': userId } });
+        const data = await res.json();
+        if (!cancelled && Array.isArray(data.keys)) setKeys(data.keys as ApiKeyItem[]);
+      } catch (error) {
+        console.error('[文档中心] 加载 API Key 失败:', error);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+
+  const createKey = async () => {
+    if (!userId) {
+      toast.error('请先登录');
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await fetch('/api/keys', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-user-id': userId },
+        body: JSON.stringify({ name: name.trim() || undefined }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.key) {
+        toast.error(data.error || '创建失败');
+        return;
+      }
+      setKeys(prev => [...prev, data.key as ApiKeyItem]);
+      setPlaintext((data.key as ApiKeyItem & { plaintext: string }).plaintext);
+      setName('');
+      toast.success(
+        typeof data.notice === 'string' ? data.notice : '已创建，请立即复制保存'
+      );
+    } catch (error) {
+      console.error('[文档中心] 创建 API Key 失败:', error);
+      toast.error('创建失败，请稍后重试');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const revokeKey = async (id: string) => {
+    if (!userId) return;
+    try {
+      const res = await fetch(`/api/keys?id=${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+        headers: { 'x-user-id': userId },
+      });
+      if (!res.ok) {
+        toast.error('吊销失败');
+        return;
+      }
+      setKeys(prev => prev.filter(item => item.id !== id));
+      toast.success('已吊销');
+    } catch (error) {
+      console.error('[文档中心] 吊销 API Key 失败:', error);
+      toast.error('吊销失败');
+    }
+  };
+
+  if (!userId) {
+    return (
+      <Card className="border-dashed">
+        <CardContent className="flex flex-wrap items-center gap-3 p-4">
+          <KeyRound className="h-4 w-4 text-muted-foreground" />
+          <p className="text-sm text-muted-foreground">登录后可创建和管理 API Key。</p>
+          <Button size="sm" variant="outline" asChild>
+            <Link href="/login">去登录</Link>
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader className="pb-3 pt-5">
+        <CardTitle className="flex items-center gap-2 text-base">
+          <KeyRound className="h-4 w-4 text-primary" />
+          我的 API Key
+        </CardTitle>
+        <CardDescription>每个 Key 每分钟 60 次调用额度，吊销后立即失效。</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3 pt-0">
+        <div className="flex flex-wrap gap-2">
+          <Input
+            className="h-9 max-w-xs"
+            placeholder="Key 名称（可选）"
+            value={name}
+            onChange={event => setName(event.target.value)}
+          />
+          <Button size="sm" onClick={createKey} disabled={loading}>
+            {loading ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Plus className="mr-1.5 h-3.5 w-3.5" />}
+            创建 Key
+          </Button>
+        </div>
+
+        {plaintext && (
+          <div className="rounded-lg border border-primary/40 bg-primary/5 p-3">
+            <div className="flex items-center gap-2 text-xs font-medium text-primary">
+              <ShieldCheck className="h-3.5 w-3.5" />
+              明文仅显示这一次，请立即保存
+            </div>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <code className="min-w-0 flex-1 break-all rounded bg-background px-2 py-1 font-mono text-xs">
+                {plaintext}
+              </code>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  navigator.clipboard.writeText(plaintext);
+                  toast.success('已复制');
+                }}
+              >
+                <Copy className="mr-1.5 h-3.5 w-3.5" /> 复制
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {keys.length === 0 ? (
+          <p className="text-sm text-muted-foreground">还没有创建 Key。</p>
+        ) : (
+          <div className="space-y-2">
+            {keys.map(key => (
+              <div key={key.id} className="flex flex-wrap items-center gap-2 rounded-lg border border-border p-2.5">
+                <span className="font-mono text-xs text-foreground">{key.maskedKey}</span>
+                <span className="text-xs text-muted-foreground">{key.name}</span>
+                <span className="text-xs text-muted-foreground">
+                  创建于 {key.createdAt.slice(0, 10)}
+                  {key.lastUsedAt ? ` · 最近调用 ${key.lastUsedAt.slice(0, 10)}` : ' · 暂未调用'}
+                </span>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="ml-auto text-destructive hover:text-destructive"
+                  onClick={() => revokeKey(key.id)}
+                >
+                  <Trash2 className="mr-1 h-3.5 w-3.5" /> 吊销
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// ============================================================================
 // 页面
 // ============================================================================
 export default function DocsPage() {
@@ -307,7 +521,7 @@ export default function DocsPage() {
     <MainLayout>
       <div className="space-y-6">
         {/* Hero Header - 与 images/videos/audio 页面风格一致 */}
-        <div className="relative overflow-hidden rounded-2xl">
+        <div className="workspace-hero relative overflow-hidden rounded-2xl">
           <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 via-purple-500/5 to-transparent" />
           <div className="absolute top-0 right-0 w-64 h-64 bg-violet-500/20 rounded-full blur-3xl" />
 
@@ -322,7 +536,7 @@ export default function DocsPage() {
                   <Badge variant="secondary" className="text-xs">v1.0</Badge>
                 </div>
                 <p className="text-muted-foreground text-sm sm:text-base">
-                  AI 短剧生成器完整使用指南，从安装部署到高级功能
+                  AI 短剧生成器完整使用指南：快速上手、核心概念与开放 API
                 </p>
               </div>
               <div className="relative w-full sm:w-64 shrink-0">
@@ -396,19 +610,23 @@ export default function DocsPage() {
               </CardContent>
             </Card>
 
-            {/* 支持我们 */}
+            {/* 需要帮助 */}
             <Card className="mt-4 bg-accent/50 border-accent">
               <CardHeader className="p-4 border-b border-accent/30">
-                <h3 className="font-semibold text-accent-foreground text-sm">支持我们</h3>
+                <h3 className="font-semibold text-accent-foreground text-sm">需要帮助？</h3>
               </CardHeader>
               <CardContent className="p-0">
                 <div className="flex gap-3 px-4 py-3">
-                  <Button variant="outline" size="sm" className="flex-1" onClick={() => window.open('https://github.com/your-org/ai-drama', '_blank')}>
-                    <Star className="h-4 w-4 mr-2" /> GitHub
-                  </Button>
-                  <Button variant="outline" size="sm" className="flex-1" onClick={() => window.open('https://discord.gg/ai-drama', '_blank')}>
-                    <Mail className="h-4 w-4 mr-2" /> Discord
-                  </Button>
+                  <Link href="/help-center" className="flex-1">
+                    <Button variant="outline" size="sm" className="w-full">
+                      <HelpCircle className="h-4 w-4 mr-2" /> 帮助中心
+                    </Button>
+                  </Link>
+                  <a href="mailto:contact@aidrama.com" className="flex-1">
+                    <Button variant="outline" size="sm" className="w-full">
+                      <Mail className="h-4 w-4 mr-2" /> 联系支持
+                    </Button>
+                  </a>
                 </div>
               </CardContent>
             </Card>
@@ -433,6 +651,9 @@ export default function DocsPage() {
 
               {sections.map((section) => (
                 <TabsContent key={section.id} value={section.id} className="space-y-6">
+                  {/* 开放 API 凭证管理 */}
+                  {section.id === 'api-reference' && <ApiKeyManager />}
+
                   {/* 搜索结果提示 */}
                   {searchQuery && (
                     <Card className="border-border">

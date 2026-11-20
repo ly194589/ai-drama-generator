@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { AUTH_COOKIE_NAME, signAuthState, verifySessionToken } from '@/lib/auth-session';
 
 /**
  * 扣子 OAuth 登录入口
@@ -48,27 +49,22 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const redirect_to = searchParams.get('redirect_to') || '/';
-    const mode = searchParams.get('mode') || 'bind'; // bind | login
-    const stateParam = searchParams.get('state'); // 前端传来的state参数
-    
-    // 解析前端传来的state参数
-    let currentUserId = '';
-    let stateData: Record<string, string | number> = {
+    const requestedMode = searchParams.get('mode') || 'login';
+    const mode = requestedMode === 'bind' ? 'bind' : 'login';
+    const baseUrl = getBaseUrl(request);
+    const currentUserId = mode === 'bind'
+      ? await verifySessionToken(request.cookies.get(AUTH_COOKIE_NAME)?.value)
+      : '';
+    if (mode === 'bind' && !currentUserId) {
+      return NextResponse.redirect(new URL('/login', baseUrl));
+    }
+
+    const stateData: Record<string, unknown> = {
       redirect_to,
       timestamp: Date.now(),
-      random: Math.random().toString(36).substring(7),
+      random: crypto.randomBytes(18).toString('base64url'),
       mode,
     };
-    
-    if (stateParam) {
-      try {
-        const parsed = JSON.parse(Buffer.from(stateParam, 'base64url').toString());
-        currentUserId = parsed.current_user_id || '';
-        stateData = { ...stateData, ...parsed };
-      } catch {
-        // ignore
-      }
-    }
     
     // 优先使用系统级OAuth配置
     const systemClientId = process.env.OAUTH_CLIENT_ID;
@@ -81,7 +77,6 @@ export async function GET(request: NextRequest) {
     const clientSecret = searchParams.get('client_secret') || systemClientSecret;
     const clientType = searchParams.get('client_type') || systemClientType;
     
-    const baseUrl = getBaseUrl(request);
     const redirectUri = `${baseUrl}/api/auth/oauth/coze/callback`;
 
     // 如果没有任何 client_id，显示配置页面
@@ -97,13 +92,13 @@ export async function GET(request: NextRequest) {
       const codeChallenge = generateCodeChallenge(codeVerifier);
       
       // 合并state数据
-      const finalState = Buffer.from(JSON.stringify({
+      const finalState = await signAuthState({
         ...stateData,
         code_verifier: codeVerifier,
         client_id: clientId,
         client_type: 'pkce',
         current_user_id: currentUserId,
-      })).toString('base64url');
+      });
 
       const authUrl = new URL('https://www.coze.cn/oauth/authorize');
       authUrl.searchParams.set('client_id', clientId);
@@ -121,13 +116,13 @@ export async function GET(request: NextRequest) {
     }
 
     // 授权码模式
-    const finalState = Buffer.from(JSON.stringify({
+    const finalState = await signAuthState({
       ...stateData,
       client_id: clientId,
       client_secret: clientSecret,
       client_type: 'code',
       current_user_id: currentUserId,
-    })).toString('base64url');
+    });
 
     const authUrl = new URL('https://www.coze.cn/oauth/authorize');
     authUrl.searchParams.set('client_id', clientId);

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseClient } from '@/storage/database/supabase-client';
+import { setSessionCookie, verifyAuthState } from '@/lib/auth-session';
 
 /**
  * 扣子 OAuth 回调处理
@@ -132,23 +133,24 @@ export async function GET(request: NextRequest) {
     let mode = 'login'; // bind | login
     let currentUserId = ''; // 绑定模式下的当前用户ID
     
-    try {
-      if (state) {
-        const stateData = JSON.parse(Buffer.from(state, 'base64url').toString());
-        clientId = stateData.client_id || '';
-        clientSecret = stateData.client_secret || '';
-        codeVerifier = stateData.code_verifier || '';
-        clientType = stateData.client_type || 'code';
-        mode = stateData.mode || 'login';
-        currentUserId = stateData.current_user_id || '';
-      }
-    } catch (e) {
-      console.error('[OAuth Callback] state 解析失败:', e);
+    const stateData = state ? await verifyAuthState<Record<string, unknown>>(state) : null;
+    if (stateData) {
+      clientId = typeof stateData.client_id === 'string' ? stateData.client_id : '';
+      clientSecret = typeof stateData.client_secret === 'string' ? stateData.client_secret : '';
+      codeVerifier = typeof stateData.code_verifier === 'string' ? stateData.code_verifier : '';
+      clientType = stateData.client_type === 'pkce' ? 'pkce' : 'code';
+      mode = stateData.mode === 'bind' ? 'bind' : 'login';
+      currentUserId = typeof stateData.current_user_id === 'string' ? stateData.current_user_id : '';
     }
 
     if (!clientId) {
       const baseUrl = process.env.COZE_PROJECT_DOMAIN_DEFAULT || 'http://localhost:5000';
       return NextResponse.redirect(new URL('/profile?bind_error=oauth_not_configured', baseUrl));
+    }
+
+    if (mode === 'bind' && !currentUserId) {
+      const baseUrl = process.env.COZE_PROJECT_DOMAIN_DEFAULT || 'http://localhost:5000';
+      return NextResponse.redirect(new URL('/login?bind_error=invalid_state', baseUrl));
     }
 
     const baseUrl = process.env.COZE_PROJECT_DOMAIN_DEFAULT || 'http://localhost:5000';
@@ -220,8 +222,6 @@ export async function GET(request: NextRequest) {
     const cozeUserId = cozeUser.user_id || cozeUser.id;
     const userEmail = cozeUser.email || `${cozeUserId}@coze.user`;
     const userName = cozeUser.nickname || cozeUser.name || cozeUser.user_name || 'Coze用户';
-    const avatarUrl = cozeUser.avatar_url || cozeUser.avatar;
-
     console.log('[OAuth Callback] 用户信息:', { cozeUserId, userName, mode });
 
     const supabase = getSupabaseClient();
@@ -318,23 +318,8 @@ export async function GET(request: NextRequest) {
         });
     }
 
-    // 创建 session token
-    const sessionToken = Buffer.from(JSON.stringify({
-      user_id: supabaseUserId,
-      coze_user_id: cozeUserId,
-      email: userEmail,
-      name: userName,
-      avatar: avatarUrl,
-      coze_access_token: access_token,
-      expires_at: Date.now() + expires_in * 1000,
-    })).toString('base64url');
-
-    // 构建重定向 URL
-    const redirectUrl = new URL('/login', baseUrl);
-    redirectUrl.searchParams.set('oauth_success', 'true');
-    redirectUrl.searchParams.set('token', sessionToken);
-
-    return NextResponse.redirect(redirectUrl);
+    const redirectUrl = new URL('/login?oauth_success=true', baseUrl);
+    return await setSessionCookie(NextResponse.redirect(redirectUrl), supabaseUserId);
   } catch (error) {
     console.error('OAuth 回调处理失败:', error);
     const baseUrl = process.env.COZE_PROJECT_DOMAIN_DEFAULT || 'http://localhost:5000';

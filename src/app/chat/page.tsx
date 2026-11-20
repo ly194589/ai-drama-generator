@@ -314,7 +314,7 @@ export default function ChatPage() {
       <div className="flex flex-col h-[calc(100vh-5rem)]">
         {/* Header */}
         {/* Hero Header with Aurora Gradient */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-rose-500 via-pink-500 to-fuchsia-500 p-6 mb-4">
+        <div className="workspace-hero relative overflow-hidden rounded-2xl bg-gradient-to-r from-rose-500 via-pink-500 to-fuchsia-500 p-6 mb-4">
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
           <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/20 rounded-full blur-3xl" />
           <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-pink-300/30 rounded-full blur-3xl" />

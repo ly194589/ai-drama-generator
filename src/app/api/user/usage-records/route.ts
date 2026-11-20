@@ -16,11 +16,11 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = getSupabaseClient();
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
+    const userId = request.headers.get('x-user-id');
     const limit = parseInt(searchParams.get('limit') || '20');
     
     if (!userId) {
-      return NextResponse.json({ error: '缺少用户ID' }, { status: 400 });
+      return NextResponse.json({ error: '未登录' }, { status: 401 });
     }
     
     // 查询消耗记录
@@ -60,10 +60,11 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = getSupabaseClient();
     const body = await request.json();
-    const { userId, type, action, cost, status = 'success', detail } = body;
+    const userId = request.headers.get('x-user-id');
+    const { type, action, cost, status = 'success', detail } = body;
     
     if (!userId || !type || !action || cost === undefined) {
-      return NextResponse.json({ error: '缺少必要参数' }, { status: 400 });
+      return NextResponse.json({ error: '未登录或缺少必要参数' }, { status: userId ? 400 : 401 });
     }
     
     const { data, error } = await supabase

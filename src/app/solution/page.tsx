@@ -6,7 +6,6 @@ import { MainLayout } from '@/components/layout/main-layout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -17,6 +16,7 @@ import {
   Sparkles,
   Zap,
   Crown,
+  Infinity,
   Building2,
   ArrowRight,
   Play,
@@ -51,7 +51,6 @@ import {
   Download,
   ExternalLink,
   HelpCircle,
-  Percent,
   Tag,
   Wallet,
 } from 'lucide-react';
@@ -63,7 +62,6 @@ import {
   siteConfig,
   contactInfo,
   featureComparison,
-  resourcePacks,
   pricingFaqs,
 } from '@/lib/site-config';
 
@@ -87,40 +85,14 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Gift,
   FileText,
   Video,
+  Infinity,
 };
 
 const getIcon = (iconName: string) => iconMap[iconName] || Sparkles;
 
 export default function SolutionPage() {
-  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [copiedFeature, setCopiedFeature] = useState<string | null>(null);
-
-  // 计算价格
-  const getDisplayPrice = (plan: typeof pricingPlans[0]) => {
-    if (plan.price === 0) return '免费';
-    if (billingPeriod === 'yearly' && plan.originalPrice) {
-      return `¥${Math.round(plan.price * 0.8)}`;
-    }
-    return `¥${plan.price}`;
-  };
-
-  const getOriginalPrice = (plan: typeof pricingPlans[0]) => {
-    if (billingPeriod === 'yearly' && plan.originalPrice) {
-      return `¥${Math.round(plan.originalPrice * 0.8)}`;
-    }
-    return null;
-  };
-
-  const getSavings = (plan: typeof pricingPlans[0]) => {
-    if (billingPeriod === 'yearly' && plan.originalPrice) {
-      const monthlyTotal = plan.price * 12;
-      const yearlyTotal = Math.round(plan.price * 0.8);
-      const savings = Math.round(((monthlyTotal - yearlyTotal) / monthlyTotal) * 100);
-      return `省${savings}%`;
-    }
-    return null;
-  };
 
   const scrollToPricing = () => {
     document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
@@ -151,6 +123,7 @@ export default function SolutionPage() {
             </h1>
             <p className="text-white/80 text-lg mb-6 max-w-2xl">
               从剧本创作到视频生成，AI全流程自动化。人物、画面、声音三一致，打造专业级短剧内容。
+              支持接入你自己的模型 API Key，9 家主流平台任选，不卖 token、不限次数。
             </p>
             <div className="flex flex-wrap gap-4">
               <Button size="lg" className="bg-white text-violet-600 hover:bg-white/90" asChild onClick={scrollToPricing}>
@@ -176,6 +149,10 @@ export default function SolutionPage() {
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-5 w-5 text-white/80" />
                 <span className="text-white/80 text-sm">7天免费试用</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-white/80" />
+                <span className="text-white/80 text-sm">自带模型 Key</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-5 w-5 text-white/80" />
@@ -213,6 +190,66 @@ export default function SolutionPage() {
           </div>
         </section>
 
+        {/* 模型接入 BYOK */}
+        <section className="px-4">
+          <div className="max-w-5xl mx-auto rounded-2xl border border-border bg-gradient-to-br from-violet-500/5 to-pink-500/5 p-6 md:p-8">
+            <div className="text-center mb-6">
+              <Badge variant="secondary" className="mb-3">
+                <Bot className="h-3 w-3 mr-1" />
+                模型自由
+              </Badge>
+              <h2 className="text-2xl font-bold mb-2">接自己的 Key，用你想用的模型</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto text-sm leading-relaxed">
+                别的平台只开一两个专用模型、按次元扣费，模型选不了、成本也算不清。我们把模型层完全开放：
+                你带自己的 API Key，模型费用直接按厂商实价结算，平台只收软件使用费。
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card className="bg-card/80">
+                <CardContent className="p-5">
+                  <Bot className="h-5 w-5 text-primary mb-3" />
+                  <h3 className="font-semibold mb-1">9 家主流平台 + 自定义</h3>
+                  <p className="text-sm text-muted-foreground">
+                    智谱、通义千问、火山引擎（豆包）、MiniMax、Moonshot、DeepSeek、文心一言、腾讯混元、NVIDIA，也支持任意 OpenAI 兼容地址。
+                  </p>
+                </CardContent>
+              </Card>
+              <Card className="bg-card/80">
+                <CardContent className="p-5">
+                  <Zap className="h-5 w-5 text-emerald-500 mb-3" />
+                  <h3 className="font-semibold mb-1">不限生成次数</h3>
+                  <p className="text-sm text-muted-foreground">
+                    套餐有效期内，剧本、分镜、人物、场景、配音、视频不限次数生成，模型费按你 Key 的实际用量走，平台不抽成。
+                  </p>
+                </CardContent>
+              </Card>
+              <Card className="bg-card/80">
+                <CardContent className="p-5">
+                  <Shield className="h-5 w-5 text-amber-500 mb-3" />
+                  <h3 className="font-semibold mb-1">Key 加密存储</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Key 仅服务端调用、加密存储、日志脱敏，随时可在设置页替换或删除。不想配 Key 也可用平台内置模型（代运行服务单独计费）。
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+              {['智谱', '通义千问', '火山引擎', 'MiniMax', 'Moonshot', 'DeepSeek', '文心一言', '腾讯混元', 'NVIDIA', '自定义接口'].map((name) => (
+                <Badge key={name} variant="secondary" className="text-xs">{name}</Badge>
+              ))}
+            </div>
+            <div className="mt-6 text-center">
+              <Button variant="outline" asChild>
+                <Link href="/settings">
+                  <Wallet className="h-4 w-4 mr-2" />
+                  去配置模型 Key
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+
         {/* 功能对比表 */}
         <section className="px-4">
           <div className="max-w-5xl mx-auto">
@@ -221,7 +258,7 @@ export default function SolutionPage() {
               <p className="text-muted-foreground">查看各套餐包含的功能差异</p>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[600px]">
+              <table className="w-full min-w-[720px]">
                 <thead>
                   <tr className="border-b border-border">
                     <th className="text-left p-4 font-medium text-muted-foreground">功能</th>
@@ -229,6 +266,7 @@ export default function SolutionPage() {
                     <th className="text-center p-4 font-medium">月卡</th>
                     <th className="text-center p-4 font-medium">季卡</th>
                     <th className="text-center p-4 font-medium">年卡</th>
+                    <th className="text-center p-4 font-medium">终身卡</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -239,6 +277,7 @@ export default function SolutionPage() {
                       <td className="text-center p-4 text-sm text-muted-foreground">{row.monthly === false ? '✕' : row.monthly === true ? '✓' : row.monthly}</td>
                       <td className="text-center p-4 text-sm text-muted-foreground">{row.quarterly === false ? '✕' : row.quarterly === true ? '✓' : row.quarterly}</td>
                       <td className="text-center p-4 text-sm">{row.yearly === false ? '✕' : row.yearly === true ? '✓' : row.yearly}</td>
+                      <td className="text-center p-4 text-sm">{row.lifetime === false ? '✕' : row.lifetime === true ? '✓' : row.lifetime}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -251,41 +290,33 @@ export default function SolutionPage() {
         <section id="pricing" className="px-4 scroll-mt-20">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold mb-2">选择适合你的方案</h2>
-            <p className="text-muted-foreground">灵活的定价，满足不同规模的需求</p>
-          </div>
-          
-          <div className="flex justify-center mb-8">
-            <Tabs value={billingPeriod} onValueChange={(v) => setBillingPeriod(v as 'monthly' | 'yearly')} className="w-fit">
-              <TabsList className="bg-muted">
-                <TabsTrigger value="monthly">月付</TabsTrigger>
-                <TabsTrigger value="yearly">
-                  年付 <Percent className="h-3 w-3 ml-1" /> <span className="text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded">省20%</span>
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+            <p className="text-muted-foreground">
+              不卖 token、不限次数，只收网站使用费，套餐有效期内随便用
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 max-w-7xl mx-auto">
             {pricingPlans.map((plan) => {
               const IconComponent = getIcon(plan.icon);
-              const displayPrice = getDisplayPrice(plan);
-              const originalPrice = getOriginalPrice(plan);
-              const savings = getSavings(plan);
+              const highlighted = plan.badge !== null;
+              const savings = plan.originalPrice
+                ? Math.round((1 - plan.price / plan.originalPrice) * 100)
+                : null;
               
               return (
                 <Card 
                   key={plan.id}
                   className={cn(
-                    'relative overflow-hidden transition-all hover:shadow-lg',
-                    plan.badge === '推荐' || plan.badge === '超值' ? 'border-primary shadow-lg scale-105 z-10' : ''
+                    'relative overflow-hidden transition-all hover:shadow-lg flex flex-col',
+                    highlighted ? 'border-primary shadow-lg z-10' : ''
                   )}
                 >
-                  {(plan.badge === '推荐' || plan.badge === '超值') && (
+                  {plan.badge && (
                     <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-violet-500 to-pink-500 text-white text-xs text-center py-1 font-medium">
                       {plan.badge}
                     </div>
                   )}
-                  <CardHeader className={cn((plan.badge === '推荐' || plan.badge === '超值') && 'pt-8')}>
+                  <CardHeader className={cn(plan.badge && 'pt-8')}>
                     <div className="flex items-center gap-3 mb-2">
                       <div className={cn('p-2 rounded-lg bg-gradient-to-br text-white', plan.color)}>
                         <IconComponent className="h-5 w-5" />
@@ -294,42 +325,31 @@ export default function SolutionPage() {
                     </div>
                     <CardDescription>{plan.description}</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-4 flex-1 flex flex-col">
                     <div className="flex items-baseline gap-1">
-                      <span className="text-4xl font-bold">{displayPrice}</span>
+                      <span className="text-4xl font-bold">{plan.price === 0 ? '免费' : `¥${plan.price}`}</span>
                       {plan.period && <span className="text-muted-foreground">{plan.period}</span>}
                     </div>
-                    {originalPrice && (
+                    {plan.originalPrice && (
                       <div className="flex items-center gap-2">
-                        <span className="text-sm line-through text-muted-foreground">{originalPrice}</span>
-                        {savings && <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">{savings}</Badge>}
+                        <span className="text-sm line-through text-muted-foreground">¥{plan.originalPrice}</span>
+                        {savings && <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">省{savings}%</Badge>}
                       </div>
                     )}
-                    
-                    {/* 配额展示 */}
+
+                    {/* 商业模式：不限次数 */}
                     <div className="p-3 rounded-lg bg-muted/50 border border-border">
-                      <p className="text-xs font-medium text-muted-foreground mb-2">包含额度</p>
-                      <div className="grid grid-cols-2 gap-2 text-sm">
-                        <div className="flex items-center gap-1">
-                          <FileText className="h-3 w-3 text-muted-foreground" />
-                          <span>剧本: {plan.quotas.scripts}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Video className="h-3 w-3 text-muted-foreground" />
-                          <span>视频: {plan.quotas.videos}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Image className="h-3 w-3 text-muted-foreground" />
-                          <span>图片: {plan.quotas.images}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Music className="h-3 w-3 text-muted-foreground" />
-                          <span>音乐: {plan.quotas.music}</span>
-                        </div>
-                      </div>
+                      <p className="text-sm font-semibold flex items-center gap-2">
+                        <Zap className="h-4 w-4 text-emerald-500" />
+                        不限生成次数
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {plan.durationDays >= 36500 ? '一次买断，长期有效' : `有效期 ${plan.durationDays} 天`}
+                        {' · '}模型费走自己的 Key
+                      </p>
                     </div>
-                    
-                    <ul className="space-y-2">
+
+                    <ul className="space-y-2 flex-1">
                       {plan.features.map((feature, idx) => (
                         <li key={idx} className="flex items-center gap-2 text-sm">
                           {feature.included ? (
@@ -341,58 +361,16 @@ export default function SolutionPage() {
                         </li>
                       ))}
                     </ul>
-                    
+
                     <Button 
-                      className={cn('w-full', (plan.badge === '推荐' || plan.badge === '超值') && 'bg-gradient-to-r from-violet-500 to-pink-500 hover:from-violet-600 hover:to-pink-600')} 
-                      variant={(plan.badge === '推荐' || plan.badge === '超值') ? 'default' : 'outline'}
+                      className={cn('w-full', highlighted && 'bg-gradient-to-r from-violet-500 to-pink-500 hover:from-violet-600 hover:to-pink-600')} 
+                      variant={highlighted ? 'default' : 'outline'}
                       asChild
                     >
                       <Link href={plan.href}>
                         {plan.cta}
                         <ChevronRight className="h-4 w-4 ml-1" />
                       </Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* 资源包 */}
-        <section className="px-4">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold mb-2">单独购买资源包</h2>
-            <p className="text-muted-foreground">按需购买，灵活补充额度</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
-            {resourcePacks.map((pack) => {
-              const IconComponent = getIcon(pack.icon);
-              return (
-                <Card key={pack.id} className={cn('hover:shadow-lg transition-all', pack.popular && 'border-primary')}>
-                  {pack.popular && (
-                    <div className="absolute top-2 right-2">
-                      <Badge variant="secondary" className="bg-primary text-primary-foreground">热门</Badge>
-                    </div>
-                  )}
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="p-2 rounded-lg bg-gradient-to-br from-violet-500/10 to-pink-500/10">
-                        <IconComponent className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold">{pack.name}</h3>
-                        {pack.originalPrice && (
-                          <p className="text-sm line-through text-muted-foreground">原价 ¥{pack.originalPrice}</p>
-                        )}
-                      </div>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-3">{pack.description}</p>
-                    <div className="flex items-baseline gap-1 mb-4">
-                      <span className="text-2xl font-bold">¥{pack.price}</span>
-                    </div>
-                    <Button className="w-full" variant={pack.popular ? 'default' : 'outline'}>
-                      购买
                     </Button>
                   </CardContent>
                 </Card>

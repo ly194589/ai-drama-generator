@@ -1392,6 +1392,49 @@ function DramaPageContent() {
     loadSeriesList();
   }, [loadSeriesList]);
 
+  // 从 Skill 市场跳转过来时，套用 Skill 参数并打开新建剧本弹窗
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('pending-drama-skill');
+      if (!raw) return;
+      localStorage.removeItem('pending-drama-skill');
+
+      const pending = JSON.parse(raw) as {
+        title?: string;
+        description?: string;
+        genre?: string;
+        style?: string;
+        imageStyle?: string;
+        totalEpisodes?: number;
+        coreConflict?: string;
+        /** 是否强制覆盖题材（仅强绑定题材的 Skill 为 true） */
+        genreFixed?: boolean;
+        /** 推荐的核心冲突类型 id */
+        conflictType?: string;
+        skillName?: string;
+      };
+
+      setNewSeries(prev => ({
+        ...prev,
+        title: pending.title || prev.title,
+        description: pending.description || prev.description,
+        // 只有强绑定题材的 Skill 才覆盖用户已选题材，避免静默替换
+        genre: pending.genreFixed && pending.genre ? pending.genre : prev.genre,
+        style: pending.style || prev.style,
+        imageStyle: pending.imageStyle || prev.imageStyle,
+        coreConflict: pending.coreConflict || prev.coreConflict,
+        coreConflictTypes: pending.conflictType
+          ? [pending.conflictType as (typeof prev.coreConflictTypes)[number]]
+          : prev.coreConflictTypes,
+        totalEpisodes: Number(pending.totalEpisodes) || prev.totalEpisodes,
+      }));
+      setShowCreateDialog(true);
+      toast.success(`已套用 Skill：${pending.skillName || '短剧 Skill'}`);
+    } catch (error) {
+      console.warn('[drama] 读取待套用 Skill 失败:', error);
+    }
+  }, []);
+
   // 过滤后的项目列表
   const filteredSeriesList = useMemo(() => {
     return seriesList.filter(series => {
@@ -7659,7 +7702,7 @@ function DramaPageContent() {
       <MainLayout>
         <div className="max-w-7xl mx-auto space-y-6 py-6">
         {/* Hero Header with Aurora Gradient */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500 p-8 mb-2">
+        <div className="workspace-hero relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500 p-8 mb-2">
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
           <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/20 rounded-full blur-3xl" />
           <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-indigo-300/30 rounded-full blur-3xl" />

@@ -21,13 +21,12 @@ const ADMIN_USER_IDS = [
  */
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
+    const userId = request.headers.get('x-user-id');
 
     if (!userId) {
       return NextResponse.json(
-        { error: '用户ID不能为空', authorized: false },
-        { status: 400 }
+        { error: '未登录', authorized: false },
+        { status: 401 }
       );
     }
 
@@ -111,6 +110,7 @@ export async function GET(request: NextRequest) {
     
     // 确保有默认的套餐类型
     const planType = cardRecord.plan_type || (
+      cardRecord.duration_days >= 36500 ? 'lifetime' :
       cardRecord.duration_days >= 365 ? 'yearly' : 
       cardRecord.duration_days >= 90 ? 'quarterly' : 'monthly'
     );
@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
       authorized: true,
       subscription: {
         planType: planType,
-        planName: planType === 'yearly' ? '年卡' : planType === 'quarterly' ? '季卡' : planType === 'trial' ? '体验卡' : '月卡',
+        planName: planType === 'lifetime' ? '终身卡' : planType === 'yearly' ? '年卡' : planType === 'quarterly' ? '季卡' : planType === 'trial' ? '体验卡' : '月卡',
         activatedAt: cardRecord.activated_at,
         expiresAt: cardRecord.expires_at,
         remainingDays,

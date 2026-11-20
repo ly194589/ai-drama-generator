@@ -1,0 +1,1580 @@
+{
+  "ai_advisor_sessions": {
+    "cols": {
+      "id": [
+        "eq",
+        "select"
+      ],
+      "updated_at": [
+        "update"
+      ],
+      "user_id": [
+        "eq"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/ai-advisor/messages/route.ts"
+    ]
+  },
+  "api_keys": {
+    "cols": {
+      "created_at": [
+        "order",
+        "select",
+        "insert"
+      ],
+      "id": [
+        "select",
+        "in",
+        "eq"
+      ],
+      "key_hash": [
+        "insert",
+        "eq"
+      ],
+      "last_used_at": [
+        "select",
+        "update"
+      ],
+      "masked_key": [
+        "select",
+        "insert"
+      ],
+      "name": [
+        "select",
+        "insert"
+      ],
+      "user_id": [
+        "eq",
+        "insert",
+        "select"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/lib/api-key-store.ts"
+    ]
+  },
+  "api_usage": {
+    "cols": {
+      "count": [
+        "select"
+      ],
+      "created_at": [
+        "gte",
+        "select",
+        "insert"
+      ],
+      "type": [
+        "select"
+      ],
+      "user_id": [
+        "eq",
+        "insert"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/usage/route.ts"
+    ]
+  },
+  "audio_materials": {
+    "cols": {
+      "category": [
+        "insert",
+        "eq"
+      ],
+      "character_id": [
+        "insert"
+      ],
+      "character_name": [
+        "insert"
+      ],
+      "created_at": [
+        "order"
+      ],
+      "description": [
+        "insert"
+      ],
+      "duration": [
+        "insert"
+      ],
+      "episode_number": [
+        "insert"
+      ],
+      "file_key": [
+        "insert"
+      ],
+      "file_name": [
+        "insert"
+      ],
+      "file_size": [
+        "insert"
+      ],
+      "format": [
+        "insert"
+      ],
+      "id": [
+        "eq"
+      ],
+      "series_id": [
+        "insert"
+      ],
+      "tags": [
+        "insert"
+      ],
+      "title": [
+        "insert"
+      ],
+      "type": [
+        "insert",
+        "eq"
+      ],
+      "user_id": [
+        "eq"
+      ],
+      "voice_style": [
+        "insert"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/audio/[id]/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/audio/generate/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/audio/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/audio/smart-tts/route.ts"
+    ]
+  },
+  "card_keys": {
+    "cols": {
+      "activated_at": [
+        "update",
+        "select",
+        "insert",
+        "order"
+      ],
+      "card_key": [
+        "eq",
+        "select",
+        "insert"
+      ],
+      "duration_days": [
+        "select",
+        "insert"
+      ],
+      "expires_at": [
+        "update",
+        "select",
+        "insert",
+        "order"
+      ],
+      "id": [
+        "eq"
+      ],
+      "metadata": [
+        "update",
+        "select",
+        "insert"
+      ],
+      "order_id": [
+        "insert"
+      ],
+      "plan_type": [
+        "eq",
+        "insert",
+        "select"
+      ],
+      "price": [
+        "insert"
+      ],
+      "status": [
+        "update",
+        "select",
+        "eq",
+        "insert"
+      ],
+      "updated_at": [
+        "update"
+      ],
+      "user_id": [
+        "update",
+        "select",
+        "insert",
+        "eq"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/auth/card-key/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/auth/login/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/auth/register/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/auth/subscription/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/auth/user-login/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/card/expire/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/card/reset/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/payment/confirm/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/payment/notify/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/lib/quota-service.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/lib/user-plan.ts"
+    ]
+  },
+  "character_artworks": {
+    "cols": {
+      "character_id": [
+        "insert"
+      ],
+      "character_name": [
+        "insert",
+        "in",
+        "select"
+      ],
+      "description": [
+        "insert"
+      ],
+      "generation_prompt": [
+        "insert"
+      ],
+      "image_url": [
+        "select"
+      ],
+      "purpose": [
+        "insert"
+      ],
+      "series_id": [
+        "eq",
+        "insert"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/episodes/[episodeNumber]/sync-assets/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/episodes/[episodeNumber]/sync-videos/route.ts"
+    ]
+  },
+  "character_voices": {
+    "cols": {
+      "character_id": [
+        "eq",
+        "insert"
+      ],
+      "character_name": [
+        "insert"
+      ],
+      "id": [
+        "eq"
+      ],
+      "series_id": [
+        "eq",
+        "insert"
+      ],
+      "updated_at": [
+        "update"
+      ],
+      "voice_id": [
+        "update",
+        "insert"
+      ],
+      "voice_name": [
+        "update",
+        "insert"
+      ],
+      "voice_style": [
+        "update",
+        "insert"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/voice/route.ts"
+    ]
+  },
+  "chat_messages": {
+    "cols": {
+      "content": [
+        "insert"
+      ],
+      "created_at": [
+        "order"
+      ],
+      "role": [
+        "insert"
+      ],
+      "session_id": [
+        "insert",
+        "eq"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/chat/advisor/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/chat/messages/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/chat/sessions/[id]/route.ts"
+    ]
+  },
+  "chat_sessions": {
+    "cols": {
+      "id": [
+        "eq"
+      ],
+      "messages": [
+        "select"
+      ],
+      "title": [
+        "insert"
+      ],
+      "updated_at": [
+        "update",
+        "order"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/chat/advisor/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/chat/messages/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/chat/sessions/[id]/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/chat/sessions/route.ts"
+    ]
+  },
+  "drama_characters": {
+    "cols": {
+      "id": [
+        "eq"
+      ],
+      "image_id": [
+        "update"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/characters/generate-image/route.ts"
+    ]
+  },
+  "drama_episodes": {
+    "cols": {
+      "brief": [
+        "update",
+        "insert"
+      ],
+      "cliffhanger": [
+        "select",
+        "update",
+        "insert",
+        "upsert"
+      ],
+      "dialogues": [
+        "insert"
+      ],
+      "episode_number": [
+        "insert",
+        "order",
+        "select",
+        "eq",
+        "upsert"
+      ],
+      "hook": [
+        "update",
+        "insert",
+        "select",
+        "upsert"
+      ],
+      "id": [
+        "select",
+        "eq"
+      ],
+      "scenes": [
+        "insert"
+      ],
+      "series_id": [
+        "insert",
+        "in",
+        "select",
+        "eq",
+        "upsert"
+      ],
+      "status": [
+        "insert",
+        "update",
+        "upsert"
+      ],
+      "storyboards": [
+        "insert",
+        "select",
+        "update",
+        "upsert"
+      ],
+      "summary": [
+        "insert",
+        "select",
+        "update",
+        "upsert"
+      ],
+      "title": [
+        "insert",
+        "select",
+        "update",
+        "upsert"
+      ],
+      "updated_at": [
+        "update"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/config/saved/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/episodes/[episodeNumber]/regenerate-cliffhanger/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/episodes/[episodeNumber]/sync-assets/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/episodes/[episodeNumber]/sync-videos/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/episodes/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/episodes/stream/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/edit/auto-compose/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/background-tasks/[taskId]/execute/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/background-tasks/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/workflow/config/[id]/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/workflow/finalize/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/workflow/one-click-v2/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/workflow/one-click/route.ts"
+    ]
+  },
+  "drama_outlines": {
+    "cols": {
+      "order": [
+        "order"
+      ],
+      "series_id": [
+        "eq"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/extract-characters/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/extract-scenes/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/outlines/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/route.ts"
+    ]
+  },
+  "drama_series": {
+    "cols": {
+      "characters": [
+        "select",
+        "insert",
+        "update"
+      ],
+      "core_conflict": [
+        "insert",
+        "select"
+      ],
+      "core_conflict_types": [
+        "insert"
+      ],
+      "created_at": [
+        "order",
+        "select"
+      ],
+      "description": [
+        "insert"
+      ],
+      "genre": [
+        "select",
+        "insert"
+      ],
+      "id": [
+        "eq",
+        "select"
+      ],
+      "image_style": [
+        "insert",
+        "select"
+      ],
+      "metadata": [
+        "update",
+        "select"
+      ],
+      "progress": [
+        "update"
+      ],
+      "status": [
+        "insert",
+        "eq",
+        "update",
+        "select"
+      ],
+      "style": [
+        "insert",
+        "select"
+      ],
+      "target_audience": [
+        "insert"
+      ],
+      "theme": [
+        "insert"
+      ],
+      "title": [
+        "insert",
+        "select",
+        "update"
+      ],
+      "total_episodes": [
+        "insert",
+        "select"
+      ],
+      "updated_at": [
+        "update",
+        "select"
+      ],
+      "user_id": [
+        "eq",
+        "insert"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/characters/generate-uid/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/config/saved/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/artwork/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/character-sheet/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/characters/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/episodes/[episodeNumber]/regenerate-cliffhanger/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/episodes/[episodeNumber]/sync-assets/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/episodes/[episodeNumber]/sync-videos/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/episodes/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/episodes/stream/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/extract-characters/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/extract-scenes/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/generate-image/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/outlines/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/scenes/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/voice/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/generate-characters/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/scenes/generate/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/v1/dramas/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/background-tasks/[taskId]/execute/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/background-tasks/[taskId]/step/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/generate/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/task/[taskId]/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/workflow/config/[id]/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/workflow/finalize/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/workflow/history/[seriesId]/[historyId]/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/workflow/one-click-v2/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/workflow/one-click/route.ts"
+    ]
+  },
+  "edit_assets": {
+    "cols": {
+      "order": [
+        "order"
+      ],
+      "project_id": [
+        "eq"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/edit/projects/[id]/execute/route.ts"
+    ]
+  },
+  "edit_projects": {
+    "cols": {
+      "config": [
+        "select",
+        "update"
+      ],
+      "created_at": [
+        "order"
+      ],
+      "description": [
+        "insert"
+      ],
+      "duration": [
+        "update"
+      ],
+      "error_message": [
+        "update"
+      ],
+      "id": [
+        "eq"
+      ],
+      "output_file_name": [
+        "update"
+      ],
+      "output_file_url": [
+        "update"
+      ],
+      "progress": [
+        "update"
+      ],
+      "status": [
+        "insert",
+        "update"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/edit/auto-compose/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/edit/projects/[id]/execute/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/edit/projects/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/edit/smart-edit/route.ts"
+    ]
+  },
+  "episodes": {
+    "cols": {
+      "episode_number": [
+        "eq"
+      ],
+      "series_id": [
+        "eq"
+      ],
+      "storyboards": [
+        "select"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/background-tasks/route.ts"
+    ]
+  },
+  "generation_tasks": {
+    "cols": {
+      "created_at": [
+        "order"
+      ],
+      "id": [
+        "eq",
+        "in"
+      ],
+      "payload": [
+        "insert"
+      ],
+      "series_id": [
+        "insert",
+        "eq"
+      ],
+      "status": [
+        "insert",
+        "in"
+      ],
+      "type": [
+        "insert"
+      ],
+      "updated_at": [
+        "update"
+      ],
+      "user_id": [
+        "insert",
+        "eq"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/lib/generation-tasks.ts"
+    ]
+  },
+  "image_materials": {
+    "cols": {
+      "category": [
+        "insert"
+      ],
+      "character_id": [
+        "insert",
+        "eq",
+        "select"
+      ],
+      "character_name": [
+        "insert",
+        "eq",
+        "select",
+        "in"
+      ],
+      "created_at": [
+        "order"
+      ],
+      "description": [
+        "insert",
+        "update"
+      ],
+      "episode_id": [
+        "insert"
+      ],
+      "file_key": [
+        "insert",
+        "select",
+        "eq"
+      ],
+      "file_name": [
+        "insert"
+      ],
+      "file_size": [
+        "insert"
+      ],
+      "format": [
+        "insert"
+      ],
+      "generation_prompt": [
+        "insert"
+      ],
+      "height": [
+        "insert"
+      ],
+      "id": [
+        "in",
+        "eq"
+      ],
+      "is_ai_generated": [
+        "insert"
+      ],
+      "mood": [
+        "update"
+      ],
+      "platform": [
+        "update"
+      ],
+      "purpose": [
+        "insert",
+        "select",
+        "update"
+      ],
+      "series_id": [
+        "insert",
+        "eq"
+      ],
+      "style": [
+        "update"
+      ],
+      "tags": [
+        "insert",
+        "update"
+      ],
+      "thumbnail_key": [
+        "insert"
+      ],
+      "title": [
+        "insert",
+        "select",
+        "eq",
+        "in",
+        "update"
+      ],
+      "type": [
+        "insert",
+        "eq"
+      ],
+      "user_id": [
+        "insert",
+        "eq"
+      ],
+      "width": [
+        "insert"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/characters/generate-image/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/characters/generate-uid/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/artwork/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/characters/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/generate-image/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/scenes/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/generate-characters/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/images/[id]/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/images/batch-generate/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/images/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/scenes/generate/route.ts"
+    ]
+  },
+  "model_usage": {
+    "cols": {
+      "count": [
+        "select",
+        "update",
+        "insert",
+        "order"
+      ],
+      "last_used_at": [
+        "update",
+        "insert",
+        "select"
+      ],
+      "model": [
+        "eq",
+        "insert",
+        "select"
+      ],
+      "provider": [
+        "eq",
+        "select"
+      ],
+      "user_id": [
+        "eq",
+        "insert"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/lib/model-usage-store.ts"
+    ]
+  },
+  "payment_orders": {
+    "cols": {
+      "amount": [
+        "insert"
+      ],
+      "card_key": [
+        "update"
+      ],
+      "duration_days": [
+        "insert"
+      ],
+      "id": [
+        "eq"
+      ],
+      "metadata": [
+        "insert",
+        "update"
+      ],
+      "order_no": [
+        "eq",
+        "insert"
+      ],
+      "paid_at": [
+        "update"
+      ],
+      "payment_method": [
+        "insert"
+      ],
+      "plan_type": [
+        "insert"
+      ],
+      "status": [
+        "update",
+        "insert"
+      ],
+      "updated_at": [
+        "update"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/payment/confirm/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/payment/create-order/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/payment/notify/route.ts"
+    ]
+  },
+  "prompts": {
+    "cols": {
+      "category": [
+        "eq"
+      ],
+      "id": [
+        "eq"
+      ],
+      "tags": [
+        "contains"
+      ],
+      "updated_at": [
+        "update"
+      ],
+      "usage_count": [
+        "order"
+      ],
+      "version": [
+        "update"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/prompts/route.ts"
+    ]
+  },
+  "scene_images": {
+    "cols": {
+      "description": [
+        "insert"
+      ],
+      "image_url": [
+        "insert",
+        "select"
+      ],
+      "series_id": [
+        "eq",
+        "insert"
+      ],
+      "title": [
+        "insert",
+        "eq"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/episodes/[episodeNumber]/sync-assets/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/episodes/[episodeNumber]/sync-videos/route.ts"
+    ]
+  },
+  "skill_licenses": {
+    "cols": {
+      "claimed_at": [
+        "order",
+        "select",
+        "insert"
+      ],
+      "license_key": [
+        "select",
+        "insert"
+      ],
+      "plan_type": [
+        "select",
+        "insert"
+      ],
+      "skill_id": [
+        "select",
+        "eq",
+        "insert"
+      ],
+      "user_id": [
+        "eq",
+        "insert"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/lib/skill-license-store.ts"
+    ]
+  },
+  "usage_records": {
+    "cols": {
+      "created_at": [
+        "order",
+        "insert"
+      ],
+      "user_id": [
+        "eq",
+        "insert"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/user/usage-records/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/lib/quota-service.ts"
+    ]
+  },
+  "user_config": {
+    "cols": {
+      "coze_access_token": [
+        "update",
+        "upsert",
+        "insert",
+        "select"
+      ],
+      "coze_refresh_token": [
+        "update",
+        "upsert",
+        "insert",
+        "select"
+      ],
+      "coze_token_expires_at": [
+        "select",
+        "update",
+        "upsert",
+        "insert"
+      ],
+      "coze_user_id": [
+        "select",
+        "update",
+        "eq",
+        "upsert",
+        "insert"
+      ],
+      "created_at": [
+        "upsert"
+      ],
+      "image_model": [
+        "select"
+      ],
+      "image_provider": [
+        "select"
+      ],
+      "image_size": [
+        "insert"
+      ],
+      "llm_model": [
+        "insert",
+        "select"
+      ],
+      "llm_provider": [
+        "select"
+      ],
+      "nvidia_api_key": [
+        "select"
+      ],
+      "nvidia_base_url": [
+        "select"
+      ],
+      "qwen_api_key": [
+        "select",
+        "upsert",
+        "update"
+      ],
+      "qwen_api_key_set_at": [
+        "select",
+        "upsert",
+        "update"
+      ],
+      "qwen_base_url": [
+        "select"
+      ],
+      "solution_preset": [
+        "select",
+        "insert"
+      ],
+      "tts_provider": [
+        "select"
+      ],
+      "tts_speaker": [
+        "select",
+        "insert"
+      ],
+      "updated_at": [
+        "upsert",
+        "update"
+      ],
+      "user_id": [
+        "eq",
+        "upsert",
+        "neq",
+        "select",
+        "insert"
+      ],
+      "video_model": [
+        "insert",
+        "select"
+      ],
+      "video_provider": [
+        "select"
+      ],
+      "zhipu_api_key": [
+        "select",
+        "upsert",
+        "update"
+      ],
+      "zhipu_api_key_set_at": [
+        "select",
+        "upsert",
+        "update"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/ai-advisor/stream/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/audio/generate/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/audio/smart-tts/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/auth/card-key/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/auth/coze-status/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/auth/oauth/coze/callback/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/auth/register/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/characters/generate-image/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/config/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/artwork/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/images/generate/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/llm/invoke/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/providers/config/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/providers/config/test/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/qwen/config/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/solution/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/background-tasks/[taskId]/execute/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/background-tasks/[taskId]/retry/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/background-tasks/[taskId]/step/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/generate/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/zhipu/config/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/lib/config.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/lib/openai-compatible-client.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/lib/qwen-client.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/lib/qwen-media-client.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/lib/user-token.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/lib/zhipu-client.ts"
+    ]
+  },
+  "user_preferences": {
+    "cols": {
+      "preferences": [
+        "upsert"
+      ],
+      "session_id": [
+        "eq",
+        "upsert"
+      ],
+      "updated_at": [
+        "upsert"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/chat/advisor/route.ts"
+    ]
+  },
+  "user_voices": {
+    "cols": {
+      "created_at": [
+        "order"
+      ],
+      "id": [
+        "eq"
+      ],
+      "sample_url": [
+        "insert"
+      ],
+      "status": [
+        "insert",
+        "eq",
+        "update"
+      ],
+      "updated_at": [
+        "update"
+      ],
+      "user_id": [
+        "insert",
+        "eq"
+      ],
+      "voice_id": [
+        "insert"
+      ],
+      "voice_name": [
+        "insert"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/zhipu/voice-clone/[id]/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/zhipu/voice-clone/create/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/zhipu/voice-clone/list/route.ts"
+    ]
+  },
+  "video_collections": {
+    "cols": {
+      "collection_id": [
+        "in",
+        "eq"
+      ],
+      "cover_image_url": [
+        "insert"
+      ],
+      "created_at": [
+        "order"
+      ],
+      "description": [
+        "insert"
+      ],
+      "id": [
+        "select",
+        "eq"
+      ],
+      "metadata": [
+        "insert"
+      ],
+      "series_id": [
+        "eq",
+        "insert",
+        "select"
+      ],
+      "title": [
+        "insert",
+        "select"
+      ],
+      "user_id": [
+        "insert",
+        "eq"
+      ],
+      "video_count": [
+        "insert",
+        "update"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/collections/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/generate/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/task/[taskId]/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/lib/video-collection.ts"
+    ]
+  },
+  "video_generation_queue": {
+    "cols": {
+      "batch_id": [
+        "eq"
+      ],
+      "shot_index": [
+        "order"
+      ],
+      "status": [
+        "eq"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/queue/submit/route.ts"
+    ]
+  },
+  "video_generation_tasks": {
+    "cols": {
+      "created_at": [
+        "order"
+      ],
+      "current_item": [
+        "insert",
+        "update"
+      ],
+      "episode_number": [
+        "insert"
+      ],
+      "error": [
+        "update"
+      ],
+      "id": [
+        "eq"
+      ],
+      "progress": [
+        "insert",
+        "update"
+      ],
+      "result": [
+        "insert",
+        "update"
+      ],
+      "series_id": [
+        "insert",
+        "eq"
+      ],
+      "status": [
+        "insert",
+        "update",
+        "in"
+      ],
+      "task_type": [
+        "insert"
+      ],
+      "total": [
+        "insert",
+        "update"
+      ],
+      "updated_at": [
+        "update"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/background-tasks/[taskId]/events/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/background-tasks/[taskId]/execute/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/background-tasks/[taskId]/retry/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/background-tasks/[taskId]/step/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/background-tasks/route.ts"
+    ]
+  },
+  "video_materials": {
+    "cols": {
+      "collection_id": [
+        "eq"
+      ],
+      "created_at": [
+        "order"
+      ],
+      "description": [
+        "insert"
+      ],
+      "duration": [
+        "insert"
+      ],
+      "episode_number": [
+        "insert"
+      ],
+      "file_key": [
+        "insert",
+        "select"
+      ],
+      "file_name": [
+        "insert"
+      ],
+      "file_size": [
+        "insert"
+      ],
+      "id": [
+        "eq"
+      ],
+      "metadata": [
+        "insert",
+        "select",
+        "update"
+      ],
+      "series_id": [
+        "insert",
+        "eq"
+      ],
+      "status": [
+        "insert",
+        "update"
+      ],
+      "title": [
+        "insert"
+      ],
+      "updated_at": [
+        "update"
+      ],
+      "user_id": [
+        "insert"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/[id]/analyze/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/[id]/generate-config/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/[id]/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/background-tasks/[taskId]/execute/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/background-tasks/[taskId]/retry/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/background-tasks/[taskId]/step/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/collections/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/generate/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/queue/process/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/lib/video-collection.ts"
+    ]
+  },
+  "video_task_queue": {
+    "cols": {
+      "attempts": [
+        "lt",
+        "update",
+        "select",
+        "insert"
+      ],
+      "completed_at": [
+        "update"
+      ],
+      "created_at": [
+        "order",
+        "insert",
+        "select"
+      ],
+      "episode_number": [
+        "insert"
+      ],
+      "id": [
+        "eq",
+        "select"
+      ],
+      "last_error": [
+        "update"
+      ],
+      "max_attempts": [
+        "select",
+        "insert"
+      ],
+      "payload": [
+        "insert",
+        "select"
+      ],
+      "priority": [
+        "order"
+      ],
+      "result": [
+        "update"
+      ],
+      "series_id": [
+        "eq",
+        "insert"
+      ],
+      "started_at": [
+        "update"
+      ],
+      "status": [
+        "in",
+        "update",
+        "insert",
+        "select"
+      ],
+      "type": [
+        "insert"
+      ],
+      "updated_at": [
+        "select"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/queue/process/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/queue/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/workflow/stats/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/lib/video-rate-limiter.ts"
+    ]
+  },
+  "videos": {
+    "cols": {
+      "collection_id": [
+        "insert"
+      ],
+      "created_at": [
+        "order"
+      ],
+      "duration": [
+        "insert"
+      ],
+      "episode_number": [
+        "eq",
+        "insert"
+      ],
+      "file_size": [
+        "insert"
+      ],
+      "hook_type": [
+        "insert",
+        "eq"
+      ],
+      "id": [
+        "eq",
+        "select"
+      ],
+      "last_frame_url": [
+        "insert"
+      ],
+      "model": [
+        "insert"
+      ],
+      "prompt": [
+        "insert"
+      ],
+      "ratio": [
+        "insert"
+      ],
+      "resolution": [
+        "insert"
+      ],
+      "series_id": [
+        "eq",
+        "insert"
+      ],
+      "sort_order": [
+        "insert",
+        "order"
+      ],
+      "status": [
+        "eq",
+        "insert"
+      ],
+      "title": [
+        "insert"
+      ],
+      "updated_at": [
+        "update"
+      ],
+      "user_id": [
+        "insert",
+        "eq"
+      ],
+      "video_url": [
+        "insert",
+        "update"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/episodes/[episodeNumber]/sync-videos/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/drama/series/[id]/merge-videos/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/[id]/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/generate/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/videos/task/[taskId]/route.ts"
+    ]
+  },
+  "workflow_cache": {
+    "cols": {
+      "access_count": [
+        "upsert"
+      ],
+      "created_at": [
+        "upsert"
+      ],
+      "dependencies": [
+        "upsert"
+      ],
+      "expires_at": [
+        "upsert"
+      ],
+      "hits": [
+        "upsert"
+      ],
+      "key": [
+        "eq"
+      ],
+      "last_accessed_at": [
+        "upsert"
+      ],
+      "size": [
+        "upsert"
+      ],
+      "tags": [
+        "upsert"
+      ],
+      "value": [
+        "upsert"
+      ],
+      "version": [
+        "upsert"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/lib/workflow/smart-cache.ts"
+    ]
+  },
+  "workflow_checkpoints": {
+    "cols": {
+      "context": [
+        "upsert"
+      ],
+      "id": [
+        "upsert"
+      ],
+      "progress": [
+        "upsert"
+      ],
+      "task_states": [
+        "upsert"
+      ],
+      "timestamp": [
+        "order",
+        "upsert"
+      ],
+      "version": [
+        "upsert"
+      ],
+      "workflow_id": [
+        "eq",
+        "upsert"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/lib/workflow/error-recovery.ts"
+    ]
+  },
+  "workflow_instances": {
+    "cols": {
+      "completed_at": [
+        "update"
+      ],
+      "context": [
+        "update"
+      ],
+      "created_at": [
+        "insert",
+        "order",
+        "select"
+      ],
+      "current_stage": [
+        "insert"
+      ],
+      "definition": [
+        "insert"
+      ],
+      "episode_id": [
+        "insert"
+      ],
+      "id": [
+        "insert",
+        "eq",
+        "select"
+      ],
+      "name": [
+        "insert",
+        "select"
+      ],
+      "progress": [
+        "insert",
+        "update",
+        "select"
+      ],
+      "series_id": [
+        "insert"
+      ],
+      "status": [
+        "insert",
+        "update",
+        "select"
+      ],
+      "updated_at": [
+        "select"
+      ]
+    },
+    "files": [
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/workflow/engine/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/workflow/execute-stream/route.ts",
+      "E:/trae_projects/project_20261115_005950/projects/src/app/api/workflow/stats/route.ts"
+    ]
+  }
+}

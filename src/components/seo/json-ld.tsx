@@ -30,7 +30,7 @@ const softwareSchema = {
   operatingSystem: 'Web Browser',
   offers: {
     '@type': 'Offer',
-    price: '29.90',
+    price: '19.90',
     priceCurrency: 'CNY',
     priceValidUntil: '2025-12-31',
   },

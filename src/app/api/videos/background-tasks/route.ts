@@ -293,7 +293,7 @@ async function startBackgroundTask(
           headers: {
             'Content-Type': 'application/json',
             // 转发必要的头部
-            ...(headers.get('authorization') && { authorization: headers.get('authorization')! }),
+            ...(headers.get('cookie') && { cookie: headers.get('cookie')! }),
           },
           body: JSON.stringify({
             prompt: storyboard.videoGeneration?.prompt || storyboard.scene?.description,

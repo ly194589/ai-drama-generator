@@ -18,12 +18,12 @@ import { checkQuota, decrementQuota, refundQuota, recordUsage, QuotaType } from 
 
 export async function GET(request: NextRequest) {
   try {
+    const userId = request.headers.get('x-user-id');
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
     const type = searchParams.get('type') as QuotaType | null;
 
     if (!userId) {
-      return NextResponse.json({ error: '缺少用户ID' }, { status: 400 });
+      return NextResponse.json({ error: '未登录' }, { status: 401 });
     }
 
     if (type) {
@@ -45,10 +45,11 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { userId, type, action, count = 1 } = body;
+    const userId = request.headers.get('x-user-id');
+    const { type, action, count = 1 } = body;
 
     if (!userId || !type || !action) {
-      return NextResponse.json({ error: '缺少必要参数' }, { status: 400 });
+      return NextResponse.json({ error: '未登录或缺少必要参数' }, { status: userId ? 400 : 401 });
     }
 
     // 扣减配额
@@ -74,10 +75,11 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { userId, type, action, count = 1 } = body;
+    const userId = request.headers.get('x-user-id');
+    const { type, action, count = 1 } = body;
 
     if (!userId || !type || !action) {
-      return NextResponse.json({ error: '缺少必要参数' }, { status: 400 });
+      return NextResponse.json({ error: '未登录或缺少必要参数' }, { status: userId ? 400 : 401 });
     }
 
     // 退还配额

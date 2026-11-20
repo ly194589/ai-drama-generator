@@ -4,21 +4,8 @@ import { getSupabaseClient } from '@/storage/database/supabase-client';
 /**
  * 从请求中获取用户ID
  */
-async function getUserId(request: NextRequest): Promise<string> {
-  const authHeader = request.headers.get('authorization');
-  
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return 'default';
-  }
-
-  try {
-    const token = authHeader.substring(7);
-    const supabase = getSupabaseClient(token);
-    const { data: { user } } = await supabase.auth.getUser();
-    return user?.id || 'default';
-  } catch {
-    return 'default';
-  }
+function getUserId(request: NextRequest): string {
+  return request.headers.get('x-user-id') || '';
 }
 
 /**

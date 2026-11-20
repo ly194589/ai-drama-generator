@@ -72,7 +72,8 @@ export async function GET(request: NextRequest) {
     }
 
     const hasApiKey = !!(data?.zhipu_api_key);
-    const maskedKey = hasApiKey ? maskApiKey(data.zhipu_api_key) : null;
+    const { decryptSecret } = await import('@/lib/secret-crypto');
+    const maskedKey = hasApiKey ? maskApiKey(decryptSecret(data.zhipu_api_key)) : null;
 
     return NextResponse.json({
       configured: hasApiKey,
@@ -125,12 +126,13 @@ export async function POST(request: NextRequest) {
     
     const supabase = getSupabaseClient();
     
-    // 保存到数据库（upsert）
+    // 保存到数据库（upsert，密钥加密落库）
+    const { encryptSecret } = await import('@/lib/secret-crypto');
     const { error } = await supabase
       .from('user_config')
       .upsert({
         user_id: userId,
-        zhipu_api_key: apiKey,
+        zhipu_api_key: encryptSecret(apiKey),
         zhipu_api_key_set_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       }, {

@@ -85,6 +85,7 @@ async function fetchUserApiKey(userId?: string): Promise<string | null> {
   }
 
   try {
+    const { decryptSecret } = await import('@/lib/secret-crypto');
     const { getSupabaseClient } = await import('@/storage/database/supabase-client');
     const supabase = getSupabaseClient();
 
@@ -95,11 +96,13 @@ async function fetchUserApiKey(userId?: string): Promise<string | null> {
       .single();
 
     if (data?.qwen_api_key) {
+      const apiKey = decryptSecret(data.qwen_api_key);
+      if (!apiKey) return null;
       userApiKeyCache.set(userId, {
-        key: data.qwen_api_key,
+        key: apiKey,
         expires: Date.now() + 5 * 60 * 1000, // 5 分钟缓存
       });
-      return data.qwen_api_key;
+      return apiKey;
     }
   } catch (error) {
     console.warn('[千问] 获取用户 API Key 失败:', error);

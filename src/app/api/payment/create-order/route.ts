@@ -12,28 +12,34 @@ import {
  */
 const PLAN_CONFIG = {
   trial: {
-    name: '体验卡',
+    name: '7天体验卡',
     price: 0,
     durationDays: 7,
-    description: '新用户免费体验',
+    description: '新用户免费体验，不限次数',
   },
   monthly: {
     name: '月卡',
-    price: 29.9,
+    price: 19.9,
     durationDays: 30,
-    description: '适合个人创作者',
+    description: '轻度创作首选',
   },
   quarterly: {
     name: '季卡',
-    price: 79,
+    price: 39.9,
     durationDays: 90,
-    description: '超值选择，省11%',
+    description: '平均每月13.3元，省33%',
   },
   yearly: {
     name: '年卡',
-    price: 199,
+    price: 109,
     durationDays: 365,
-    description: '最佳性价比，省44%',
+    description: '平均每月9.1元，省54%',
+  },
+  lifetime: {
+    name: '终身卡',
+    price: 298,
+    durationDays: 36500,
+    description: '一次买断，不再续费',
   },
 };
 
@@ -42,12 +48,16 @@ const PLAN_CONFIG = {
  * 创建支付宝支付订单
  * 
  * 请求体：
- * - planType: 套餐类型 (monthly | quarterly | yearly)
+ * - planType: 套餐类型 (monthly | quarterly | yearly | lifetime)
  * - payType: 支付方式 (wap-手机网页 | page-电脑网页)，默认 wap
  */
 export async function POST(request: NextRequest) {
   try {
     const { planType, payType = 'wap' } = await request.json();
+    const userId = request.headers.get('x-user-id');
+    if (!userId) {
+      return NextResponse.json({ error: '请先登录' }, { status: 401 });
+    }
 
     if (!planType || !PLAN_CONFIG[planType as keyof typeof PLAN_CONFIG]) {
       return NextResponse.json(
@@ -72,6 +82,7 @@ export async function POST(request: NextRequest) {
         duration_days: plan.durationDays,
         status: 'pending',
         payment_method: 'alipay',
+        metadata: { userId },
       })
       .select()
       .single();

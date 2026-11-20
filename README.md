@@ -344,11 +344,18 @@ export const useStore = create<Store>((set) => ({
 
 ## 登录认证配置
 
-本项目支持两种登录方式：开发者登录（开发调试）和扣子 OAuth 登录（正式用户）。
+支持用户名密码、卡密和扣子 OAuth 登录。服务端以签名会话 Cookie 识别用户，所有部署环境都必须配置会话密钥。
+
+```bash
+# 至少 32 个字符的高熵随机值，不要加 NEXT_PUBLIC_ 前缀
+AUTH_SESSION_SECRET=<random-secret-at-least-32-characters>
+```
+
+可用 `openssl rand -base64 48` 生成密钥。生产环境请在托管平台的服务端环境变量中设置，不能提交真实密钥。
 
 ### 开发者登录
 
-用于本地开发和调试，无需配置 OAuth 即可登录。
+仅用于本地开发调试。该接口在 `NODE_ENV=production` 或 `COZE_PROJECT_ENV=PROD` 时关闭。
 
 **环境变量配置：**
 
@@ -357,11 +364,11 @@ export const useStore = create<Store>((set) => ({
 DEV_LOGIN_PASSWORD=your-dev-password
 ```
 
-访问登录页面时，输入开发者密码即可登录。**注意：开发者登录仅限开发调试使用，生产环境请使用 OAuth 登录。**
+配置后可通过 `/api/auth/dev-login` 使用该密码登录；生产环境不要设置此变量。
 
 ### 扣子 OAuth 登录
 
-正式用户登录方式，需要配置扣子开放平台的 OAuth 应用。
+扣子 OAuth 登录需要配置开放平台应用。OAuth 登录仅建立身份会话；使用创作功能仍需有有效订阅。
 
 #### 步骤一：创建 OAuth 应用
 
@@ -376,15 +383,16 @@ DEV_LOGIN_PASSWORD=your-dev-password
 - **本地开发**：`http://localhost:5000/api/auth/oauth/coze/callback`
 - **生产环境**：`https://your-domain.com/api/auth/oauth/coze/callback`
 
-> ⚠️ 回调地址必须与代码中配置的 `COZE_OAUTH_REDIRECT_URI` 完全一致，包括协议（http/https）、域名和路径。
+回调地址使用 `COZE_PROJECT_DOMAIN_DEFAULT` 作为站点域名，路径固定为 `/api/auth/oauth/coze/callback`。
 
 #### 步骤三：配置环境变量
 
 ```bash
 # .env.local
-COZE_OAUTH_CLIENT_ID=your-client-id
-COZE_OAUTH_CLIENT_SECRET=your-client-secret
-COZE_OAUTH_REDIRECT_URI=http://localhost:5000/api/auth/oauth/coze/callback
+OAUTH_CLIENT_ID=your-client-id
+OAUTH_CLIENT_SECRET=your-client-secret
+OAUTH_CLIENT_TYPE=pkce
+COZE_PROJECT_DOMAIN_DEFAULT=http://localhost:5000
 ```
 
 #### 公网部署配置
@@ -393,7 +401,7 @@ COZE_OAUTH_REDIRECT_URI=http://localhost:5000/api/auth/oauth/coze/callback
 
 1. **修改回调地址**：
    ```bash
-   COZE_OAUTH_REDIRECT_URI=https://your-domain.com/api/auth/oauth/coze/callback
+   COZE_PROJECT_DOMAIN_DEFAULT=https://your-domain.com
    ```
 
 2. **在扣子开放平台添加回调地址**：

@@ -1,10 +1,9 @@
 #!/bin/bash
 set -Eeuo pipefail
 
-PORT=5000
 COZE_WORKSPACE_PATH="${COZE_WORKSPACE_PATH:-$(pwd)}"
 NODE_ENV=development
-DEPLOY_RUN_PORT="${DEPLOY_RUN_PORT:-${PORT}}"
+DEPLOY_RUN_PORT="${DEPLOY_RUN_PORT:-5000}"
 
 cd "${COZE_WORKSPACE_PATH}"
 
@@ -26,8 +25,8 @@ kill_port_if_listening() {
     fi
 }
 
-echo "Clearing port ${PORT} before start."
+echo "Clearing port ${DEPLOY_RUN_PORT} before start."
 kill_port_if_listening
-echo "Starting HTTP service on port ${PORT} for dev..."
+echo "Starting HTTP service on port ${DEPLOY_RUN_PORT} for dev..."
 
-pnpm next dev --webpack --port $PORT
+pnpm next dev --webpack --port "${DEPLOY_RUN_PORT}"

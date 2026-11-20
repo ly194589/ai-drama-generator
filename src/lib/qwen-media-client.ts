@@ -77,6 +77,7 @@ export function resolveDashScopeBase(baseUrl?: string | null): string {
 export async function getQwenMediaConfig(userId: string): Promise<QwenMediaConfig | null> {
   if (!userId) return null;
   try {
+    const { decryptSecret } = await import('@/lib/secret-crypto');
     const { getSupabaseClient } = await import('@/storage/database/supabase-client');
     const supabase = getSupabaseClient();
     const { data } = await supabase
@@ -86,7 +87,7 @@ export async function getQwenMediaConfig(userId: string): Promise<QwenMediaConfi
       .single();
 
     const record = (data || {}) as unknown as Record<string, unknown>;
-    const apiKey = typeof record.qwen_api_key === 'string' ? record.qwen_api_key.trim() : '';
+    const apiKey = typeof record.qwen_api_key === 'string' ? decryptSecret(record.qwen_api_key).trim() : '';
     const rawBase = typeof record.qwen_base_url === 'string' ? record.qwen_base_url : '';
 
     if (!apiKey) {

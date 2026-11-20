@@ -13,6 +13,11 @@ import { generateCardKey } from '@/lib/alipay';
  */
 export async function POST(request: NextRequest) {
   try {
+    if (process.env.NODE_ENV === 'production' || process.env.COZE_PROJECT_ENV === 'PROD') {
+      return NextResponse.json({ error: '生产环境不支持模拟支付确认' }, { status: 404 });
+    }
+    const sessionUserId = request.headers.get('x-user-id');
+    if (!sessionUserId) return NextResponse.json({ error: '请先登录' }, { status: 401 });
     const { orderNo } = await request.json();
 
     if (!orderNo) {
@@ -36,6 +41,10 @@ export async function POST(request: NextRequest) {
         { error: '订单不存在' },
         { status: 404 }
       );
+    }
+
+    if (order.metadata?.userId !== sessionUserId) {
+      return NextResponse.json({ error: '订单不存在' }, { status: 404 });
     }
 
     // 检查订单状态
@@ -267,6 +276,11 @@ export async function GET(request: NextRequest) {
         { error: '订单不存在' },
         { status: 404 }
       );
+    }
+
+    const sessionUserId = request.headers.get('x-user-id');
+    if (!sessionUserId || order.metadata?.userId !== sessionUserId) {
+      return NextResponse.json({ error: '订单不存在' }, { status: 404 });
     }
 
     return NextResponse.json({

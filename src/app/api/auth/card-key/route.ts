@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseClient } from '@/storage/database/supabase-client';
+import { isAuthSessionConfigured, setSessionCookie } from '@/lib/auth-session';
 
 /**
  * 卡密验证 API
@@ -13,7 +14,10 @@ import { getSupabaseClient } from '@/storage/database/supabase-client';
  */
 export async function POST(request: NextRequest) {
   try {
-    const { cardKey, userId } = await request.json();
+    if (!isAuthSessionConfigured()) {
+      return NextResponse.json({ error: '服务端未配置登录会话密钥' }, { status: 503 });
+    }
+    const { cardKey } = await request.json();
 
     if (!cardKey) {
       return NextResponse.json(
@@ -43,6 +47,9 @@ export async function POST(request: NextRequest) {
 
     // 检查卡密状态
     if (cardRecord.status === 'used') {
+      if (!cardRecord.user_id) {
+        return NextResponse.json({ error: '卡密账号数据异常，请联系客服' }, { status: 409 });
+      }
       // 卡密已激活，检查是否过期
       const now = new Date();
       const expiresAt = new Date(cardRecord.expires_at);
@@ -59,11 +66,12 @@ export async function POST(request: NextRequest) {
       // 未过期，允许登录（返回已有用户信息）
       const remainingDays = Math.ceil((expiresAt.getTime() - now.getTime()) / (24 * 60 * 60 * 1000));
       const planName = cardRecord.plan_name || (
+        cardRecord.duration_days >= 36500 ? '终身卡' :
         cardRecord.duration_days >= 365 ? '年卡' :
         cardRecord.duration_days >= 90 ? '季卡' : cardRecord.duration_days >= 30 ? '月卡' : '体验卡'
       );
       
-      return NextResponse.json({
+      const response = NextResponse.json({
         success: true,
         user: {
           id: cardRecord.user_id,
@@ -79,6 +87,7 @@ export async function POST(request: NextRequest) {
           remainingDays: remainingDays,
         },
       });
+      return await setSessionCookie(response, cardRecord.user_id, cardRecord.expires_at);
     }
 
     if (cardRecord.status === 'expired') {
@@ -98,7 +107,7 @@ export async function POST(request: NextRequest) {
     // 激活卡密
     const now = new Date();
     const expiresAt = new Date(now.getTime() + cardRecord.duration_days * 24 * 60 * 60 * 1000);
-    const effectiveUserId = userId || `user_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    const effectiveUserId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
 
     const { error: updateError } = await supabase
       .from('card_keys')
@@ -143,11 +152,12 @@ export async function POST(request: NextRequest) {
     
     // 确定套餐类型名称
     const planName = cardRecord.plan_name || (
+      cardRecord.duration_days >= 36500 ? '终身卡' :
       cardRecord.duration_days >= 365 ? '年卡' :
       cardRecord.duration_days >= 90 ? '季卡' : '月卡'
     );
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       user: {
         id: effectiveUserId,
@@ -155,7 +165,7 @@ export async function POST(request: NextRequest) {
         email: `${effectiveUserId}@drama.local`,
       },
       subscription: {
-        planType: cardRecord.plan_type || (cardRecord.duration_days >= 365 ? 'yearly' : cardRecord.duration_days >= 90 ? 'quarterly' : 'monthly'),
+        planType: cardRecord.plan_type || (cardRecord.duration_days >= 36500 ? 'lifetime' : cardRecord.duration_days >= 365 ? 'yearly' : cardRecord.duration_days >= 90 ? 'quarterly' : 'monthly'),
         planName: planName,
         activatedAt: now.toISOString(),
         expiresAt: expiresAt.toISOString(),
@@ -163,6 +173,7 @@ export async function POST(request: NextRequest) {
         remainingDays: remainingDays,
       },
     });
+    return await setSessionCookie(response, effectiveUserId, expiresAt);
 
   } catch (error) {
     console.error('[卡密验证] 处理请求失败:', error);

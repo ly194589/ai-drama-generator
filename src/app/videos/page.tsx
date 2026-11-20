@@ -744,7 +744,7 @@ export default function VideosPage() {
     <MainLayout>
       <div className="space-y-6">
         {/* Hero Header */}
-        <div className="relative overflow-hidden rounded-2xl">
+        <div className="workspace-hero relative overflow-hidden rounded-2xl">
           <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 via-purple-500/5 to-transparent" />
           <div className="absolute top-0 right-0 w-64 h-64 bg-violet-500/20 rounded-full blur-3xl" />
           

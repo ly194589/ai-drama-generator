@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -172,31 +172,24 @@ interface Stats {
   };
 }
 
-// 智能推荐
-const recommendations = [
+interface Recommendation {
+  title: string;
+  description: string;
+  action: string;
+  href: string;
+  icon: LucideIcon;
+  type: 'tip' | 'action' | 'alert';
+}
+
+// 未登录用户可见的通用建议
+const recommendations: Recommendation[] = [
   {
-    title: '优化开场钩子',
-    description: '根据热门短剧分析，建议在开场3秒内设置强悬念',
+    title: '设计开场悬念',
+    description: '在开场尽早呈现冲突、目标或悬念，帮助观众快速进入剧情。',
     action: '查看详情',
     href: '/docs#rhythm-design',
     icon: Lightbulb,
-    type: 'tip'
-  },
-  {
-    title: '使用批量生成',
-    description: '您有3个剧本待生成，建议使用工作流批量处理',
-    action: '开始生成',
-    href: '/workflow',
-    icon: Rocket,
-    type: 'action'
-  },
-  {
-    title: '角色立绘更新',
-    description: '检测到部分角色缺少立绘，影响视频生成质量',
-    action: '去生成',
-    href: '/images',
-    icon: Star,
-    type: 'alert'
+    type: 'tip',
   }
 ];
 
@@ -281,6 +274,41 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const dashboardRecommendations: Recommendation[] = useMemo(() => {
+    if (!isLoggedIn || loading) return recommendations;
+
+    const items: Recommendation[] = [];
+    if (stats.workflowStats.running > 0) {
+      items.push({
+        title: `继续处理 ${stats.workflowStats.running} 个进行中的工作流`,
+        description: '查看生成进度，处理失败步骤或继续未完成的任务。',
+        action: '查看任务', href: '/workflow', icon: Workflow, type: 'action',
+      });
+    }
+    if (stats.dramas === 0) {
+      items.push({
+        title: '创建第一部短剧',
+        description: '从题材和故事设定开始，生成大纲、分集剧本与分镜。',
+        action: '开始创作', href: '/drama', icon: BookOpen, type: 'action',
+      });
+    } else if (stats.videos === 0) {
+      items.push({
+        title: '从剧本开始生成视频',
+        description: '打开已有剧集，继续准备分镜素材并生成镜头视频。',
+        action: '打开剧集', href: '/drama', icon: Video, type: 'action',
+      });
+    }
+    if (stats.images === 0) {
+      items.push({
+        title: '准备角色与场景图片',
+        description: '生成可复用的角色立绘和场景图，为分镜视频准备素材。',
+        action: '生成图片', href: '/images', icon: ImageIcon, type: 'tip',
+      });
+    }
+    if (items.length === 0) return recommendations;
+    return items.slice(0, 3);
+  }, [isLoggedIn, loading, stats]);
 
   // 加载统计数据
   const loadStats = useCallback(async () => {
@@ -620,7 +648,7 @@ export default function HomePage() {
               </CardHeader>
               <CardContent className="px-4 pb-4">
                 <div className="space-y-2">
-                  {recommendations.map((rec, index) => (
+                  {dashboardRecommendations.map((rec, index) => (
                     <Link
                       key={index}
                       href={rec.href}

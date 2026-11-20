@@ -647,7 +647,7 @@ export default function ImagesPage() {
     <MainLayout>
       <div className="space-y-6">
         {/* Hero Header */}
-        <div className="relative overflow-hidden rounded-2xl">
+        <div className="workspace-hero relative overflow-hidden rounded-2xl">
           {/* Gradient Background */}
           <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-amber-500/5 to-transparent" />
           <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/20 rounded-full blur-3xl" />

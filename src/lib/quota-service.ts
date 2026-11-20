@@ -32,12 +32,16 @@ const ADMIN_USER_IDS = [
 ];
 
 // 套餐配额配置
+// 商业模式：只收网站使用费，不限生成次数（用超大值表示不限）
+const UNLIMITED_QUOTA = { scripts: 999999, videos: 999999, images: 999999, music: 999999 };
+
 const PLAN_QUOTAS: Record<string, { scripts: number; videos: number; images: number; music: number }> = {
-  trial: { scripts: 1, videos: 5, images: 20, music: 5 },
-  monthly: { scripts: 5, videos: 300, images: 500, music: 300 },
-  quarterly: { scripts: 20, videos: 1350, images: 2000, music: 1350 },
-  yearly: { scripts: 125, videos: 6950, images: 10000, music: 6950 },
-  admin: { scripts: 999999, videos: 999999, images: 999999, music: 999999 },
+  trial: UNLIMITED_QUOTA,
+  monthly: UNLIMITED_QUOTA,
+  quarterly: UNLIMITED_QUOTA,
+  yearly: UNLIMITED_QUOTA,
+  lifetime: UNLIMITED_QUOTA,
+  admin: UNLIMITED_QUOTA,
 };
 
 /**
@@ -86,6 +90,7 @@ export async function getUserQuotas(userId: string): Promise<UserQuotas | null> 
 
   // 获取套餐类型
   const planType = cardRecord.plan_type || (
+    cardRecord.duration_days >= 36500 ? 'lifetime' :
     cardRecord.duration_days >= 365 ? 'yearly' : 
     cardRecord.duration_days >= 90 ? 'quarterly' : 'monthly'
   );
@@ -356,6 +361,7 @@ export async function getUserMemberTier(userId: string): Promise<MemberTier> {
 
   // 返回套餐类型
   return (cardRecord.plan_type || (
+    cardRecord.duration_days >= 36500 ? 'lifetime' :
     cardRecord.duration_days >= 365 ? 'yearly' : 
     cardRecord.duration_days >= 90 ? 'quarterly' : 'monthly'
   )) as MemberTier;

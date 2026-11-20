@@ -25,10 +25,12 @@ import {
   Loader2,
   ChevronLeft,
   Menu,
+  X,
   Zap,
   Wand2,
   Clock,
   Crown,
+  Infinity,
   Star,
   Gift,
 } from 'lucide-react';
@@ -128,6 +130,13 @@ const navGroups = [
     title: 'AI助手',
     items: [
       {
+        title: 'Skill 市场',
+        href: '/skills',
+        icon: Wand2,
+        description: '可复用的短剧生产流程',
+        color: 'from-violet-500 to-fuchsia-500',
+      },
+      {
         title: '提示词库',
         href: '/prompts',
         icon: MessageSquareText,
@@ -181,7 +190,12 @@ const navGroups = [
   },
 ];
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  mobileOpen?: boolean;
+  onMobileOpenChange?: (open: boolean) => void;
+}
+
+export function AppSidebar({ mobileOpen = false, onMobileOpenChange }: AppSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { isAuthorized, isAdmin, subscription, isLoading } = useSubscription(false);
@@ -225,6 +239,7 @@ export function AppSidebar() {
   }, [collapsed]);
 
   const handleLogout = () => {
+    void fetch('/api/auth/logout', { method: 'POST' });
     // 清理所有认证相关的存储
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
@@ -239,6 +254,8 @@ export function AppSidebar() {
   // 获取套餐图标
   const getPlanIcon = (planType: string) => {
     switch (planType) {
+      case 'lifetime':
+        return Infinity;
       case 'yearly':
         return Crown;
       case 'quarterly':
@@ -253,6 +270,8 @@ export function AppSidebar() {
   // 获取套餐名称
   const getPlanName = (planType: string) => {
     switch (planType) {
+      case 'lifetime':
+        return '终身卡';
       case 'yearly':
         return '年卡';
       case 'quarterly':
@@ -268,12 +287,13 @@ export function AppSidebar() {
     <TooltipProvider delayDuration={0}>
       <aside
         className={cn(
-          'fixed left-0 top-0 z-40 h-screen border-r border-border/60 bg-background/95 backdrop-blur-xl transition-all duration-300 ease-in-out',
-          collapsed ? 'w-16' : 'w-64'
+          'fixed left-0 top-0 z-40 h-dvh w-72 border-r border-border/60 bg-background/95 shadow-xl shadow-foreground/5 backdrop-blur-xl transition-all duration-300 ease-in-out lg:shadow-none',
+          collapsed ? 'lg:w-16' : 'lg:w-64',
+          mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
       >
         <div className="flex h-full flex-col">
-          {/* Logo - 更炫酷的渐变 */}
+          {/* Brand */}
           <div className="flex h-16 items-center justify-between border-b border-border/50 px-4">
             <Link href="/" className="flex items-center gap-2.5 group">
               {/* 主图标 - 使用更炫酷的渐变 */}
@@ -292,8 +312,17 @@ export function AppSidebar() {
             <Button
               variant="ghost"
               size="icon"
+              className="h-8 w-8 shrink-0 lg:hidden"
+              aria-label="关闭导航菜单"
+              onClick={() => onMobileOpenChange?.(false)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
               className={cn(
-                'h-8 w-8 shrink-0 hover:bg-accent/50 rounded-lg transition-colors',
+                'hidden h-8 w-8 shrink-0 rounded-lg transition-colors hover:bg-accent/50 lg:flex',
                 collapsed && 'absolute right-2'
               )}
               onClick={() => setCollapsed(!collapsed)}
@@ -326,6 +355,7 @@ export function AppSidebar() {
                       <Link
                         key={item.href}
                         href={itemHref}
+                        onClick={() => onMobileOpenChange?.(false)}
                         className={cn(
                           'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 group relative',
                           'hover:shadow-sm',
@@ -451,6 +481,7 @@ export function AppSidebar() {
                       const PlanIcon = getPlanIcon(subscription.planType);
                       return <PlanIcon className={cn(
                         'h-3.5 w-3.5',
+                        subscription.planType === 'lifetime' ? 'text-rose-600' :
                         subscription.planType === 'yearly' ? 'text-amber-600' :
                         subscription.planType === 'quarterly' ? 'text-blue-600' : 'text-green-600'
                       )} />;
@@ -462,7 +493,7 @@ export function AppSidebar() {
                         </span>
                         <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5">
                           <Clock className="h-3 w-3" />
-                          {subscription.remainingDays}天
+                          {subscription.planType === 'lifetime' ? '永久' : `${subscription.remainingDays}天`}
                         </span>
                       </div>
                     </div>
